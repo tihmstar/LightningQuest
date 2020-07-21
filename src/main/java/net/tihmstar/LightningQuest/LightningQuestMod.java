@@ -2,7 +2,9 @@ package net.tihmstar.LightningQuest;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.command.Commands;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -16,14 +18,14 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mojang.brigadier.*;
-
 import java.util.stream.Collectors;
 
+/*import com.mojang.brigadier.*;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static com.mojang.brigadier.builder.LiteralArgumentBuilder.literal;
-import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
+import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;*/
+import com.mojang.brigadier.CommandDispatcher.*;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("lightningquest")
@@ -31,7 +33,7 @@ public class LightningQuestMod
 {
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
-    CommandDispatcher<Object> dispatcher = new CommandDispatcher<>();
+    // CommandDispatcher<Object> dispatcher = new CommandDispatcher<>();
 
 
     public LightningQuestMod() {
@@ -43,6 +45,8 @@ public class LightningQuestMod
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
         // Register the doClientStuff method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
+        // Register the commands register callback
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegisterCommands);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -78,20 +82,15 @@ public class LightningQuestMod
     public void onServerStarting(FMLServerStartingEvent event) {
         // do something when the server starts
         LOGGER.info("HELLO from server starting");
-        dispatcher.register(
-                literal("foo")
-                        .then(
-                                argument("bar", integer())
-                                        .executes(c -> {
-                                            System.out.println("Bar is " + getInteger(c, "bar"));
-                                            return 1;
-                                        })
-                        )
-                        .executes(c -> {
-                            System.out.println("Called foo with no arguments");
-                            return 1;
-                        })
-        );
+        event.getServer().getCommandManager().getDispatcher().register(Commands.literal("foo").executes(command -> {
+            LOGGER.info("/foo command dispatched");
+            return 0;
+        }));
+    }
+
+    //@RegisterCommandsEvent
+    public void onRegisterCommands(RegisterCommandsEvent event) {
+        LOGGER.info("HELLO register commands here!!!");
     }
 
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
