@@ -110,6 +110,13 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+    repositories {
+        maven {
+            url "https://libraries.minecraft.net"
+        }
+    }
+    compile 'com.mojang:brigadier:1.0.17'
+
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -145,3 +152,4 @@ publishing {
         }
     }
 }
+
