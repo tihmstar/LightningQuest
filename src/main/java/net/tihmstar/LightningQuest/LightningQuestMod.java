@@ -31,6 +31,8 @@ public class LightningQuestMod
 {
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
+    CommandDispatcher<Object> dispatcher = new CommandDispatcher<>();
+
 
     public LightningQuestMod() {
         // Register the setup method for modloading
@@ -51,23 +53,6 @@ public class LightningQuestMod
         // some preinit code
         LOGGER.info("HELLO FROM PREINIT");
         LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
-
-        CommandDispatcher<Object> dispatcher = new CommandDispatcher<>();
-
-        dispatcher.register(
-                literal("foo")
-                        .then(
-                                argument("bar", integer())
-                                        .executes(c -> {
-                                            System.out.println("Bar is " + getInteger(c, "bar"));
-                                            return 1;
-                                        })
-                        )
-                        .executes(c -> {
-                            System.out.println("Called foo with no arguments");
-                            return 1;
-                        })
-        );
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
@@ -93,6 +78,20 @@ public class LightningQuestMod
     public void onServerStarting(FMLServerStartingEvent event) {
         // do something when the server starts
         LOGGER.info("HELLO from server starting");
+        dispatcher.register(
+                literal("foo")
+                        .then(
+                                argument("bar", integer())
+                                        .executes(c -> {
+                                            System.out.println("Bar is " + getInteger(c, "bar"));
+                                            return 1;
+                                        })
+                        )
+                        .executes(c -> {
+                            System.out.println("Called foo with no arguments");
+                            return 1;
+                        })
+        );
     }
 
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
