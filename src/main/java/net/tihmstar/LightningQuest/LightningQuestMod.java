@@ -173,7 +173,7 @@ public class LightningQuestMod
                                                     pendingInvitesForPlayer.add(squad.squadName);
                                                 }
                                             }
-                                            player.sendStatusMessage(new StringTextComponent(String.format("You have pending invitations to join the following squads:%s", String.join("\n- ", pendingInvitesForPlayer))), false);
+                                            player.sendStatusMessage(new StringTextComponent(String.format("You have pending invitations to join the following squads:%s", String.join(", ", pendingInvitesForPlayer))), false);
                                             return 0;
                                         }
 
@@ -185,15 +185,11 @@ public class LightningQuestMod
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         LOGGER.info("HELLO from player logged in event! {} ({}) joined.", event.getPlayer().getName().getString(), event.getPlayer().getUniqueID());
-        // initialize squad to null
-        playerToSquad.put(event.getPlayer().getUniqueID(), null);
     }
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         LOGGER.info("HELLO from player logged out event! {} joined.", event.getPlayer().getName().getString());
-        // test if player was in squad when leaving and if so, remove player from squad.
-        playerLeaveSquad(event.getPlayer());
     }
 
     @SubscribeEvent
@@ -247,7 +243,7 @@ public class LightningQuestMod
         playerToSquad.put(player.getUniqueID(), squadUUID);
         squad.join(player.getUniqueID());
         LOGGER.info("Player {} created squad {}.", player.getName().getString(), name);
-        StringTextComponent msg = new StringTextComponent(String.format("You successfully created squad %s!\nHold the burden of carrying a bunch of Idiots around",name));
+        StringTextComponent msg = new StringTextComponent(String.format("You successfully created squad %s!\nHold the burden of carrying a bunch of idiots",name));
         player.sendStatusMessage(msg, false);
     }
 
