@@ -100,8 +100,7 @@ public class LightningQuestMod
                                             final String name = command.getArgument("name", String.class);
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
                                             LOGGER.info("/squad create command dispatched:\n{}", name);
-                                            playerCreateSquad(player, name);
-                                            // TODO: send broadcast about new squad
+                                            player.sendStatusMessage(playerCreateSquad(player, name), false);
                                             return 0;
                                         })
                         )
@@ -129,8 +128,7 @@ public class LightningQuestMod
                                             final String name = command.getArgument("name", String.class);
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
                                             LOGGER.info("/squad join command dispatched:\n{}", name);
-                                            playerJoinSquadByName(player, name);
-                                            // TODO: broadcast player joining squad
+                                            player.sendStatusMessage(playerJoinSquadByName(player, name), false);
                                             return 0;
                                         })
                         )
