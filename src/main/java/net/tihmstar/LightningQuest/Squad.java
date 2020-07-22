@@ -6,9 +6,9 @@ import net.minecraftforge.event.world.NoteBlockEvent;
 import java.util.*;
 
 public class Squad {
-    private ArrayList<PlayerEntity> players = new ArrayList<>();
+    private ArrayList<UUID> players = new ArrayList<>();
     private ArrayList<UUID> invites = new ArrayList<>();
-    private boolean massKillingInProgress = false;
+    public boolean massKillingInProgress = false;
     public String squadName;
 
     public Squad(String squadName) {
@@ -17,7 +17,7 @@ public class Squad {
 
     public void join(PlayerEntity player) {
         if (players.isEmpty() || invites.contains(player.getUniqueID())) {
-            players.add(player);
+            players.add(player.getUniqueID());
             if (invites.contains(player.getUniqueID())) {
                 // delete invitation
                 invites.remove(player.getUniqueID());
@@ -31,7 +31,7 @@ public class Squad {
     }
 
     public void invite(PlayerEntity player) {
-        if (!players.contains(player) && !invites.contains(player)){
+        if (!players.contains(player.getUniqueID()) && !invites.contains(player.getUniqueID())){
             invites.add(player.getUniqueID());
         }
     }
@@ -40,6 +40,27 @@ public class Squad {
         return players.size();
     }
 
+    public final List<UUID> getSquadMembers() {
+        return players;
+    }
+
+    public boolean startMassKilling() {
+        /*
+        returns true if this is the first member to start a mass killing
+         */
+        if (massKillingInProgress) {
+            return false;
+        }
+        massKillingInProgress = true;
+        return true;
+    }
+
+    public void stopMassKilling() {
+        massKillingInProgress = false;
+    }
+
+    /*
+    // TODO: move to ligthningquestmod
     public void killAllPlayers() {
         // do not allow recursion to prevent infinite loop
         // players in the same squad might kill each other indefinitely otherwise
@@ -53,6 +74,8 @@ public class Squad {
         }
         massKillingInProgress = false;
     }
+    *
+     */
 
     public double getDamageMultiplier() {
         // TODO: implement logic to change damage by looking at squad size
