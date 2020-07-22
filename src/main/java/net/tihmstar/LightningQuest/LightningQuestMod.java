@@ -7,10 +7,12 @@ import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -32,6 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.minecraft.command.arguments.EntityArgument.getPlayers;
+import static net.minecraft.entity.EntityType.LIGHTNING_BOLT;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("lightningquest")
@@ -44,6 +47,8 @@ public class LightningQuestMod
     private static HashMap<UUID, Squad> squadUuidMap = new HashMap<UUID, Squad>();
 
     private static MinecraftServer gServer = null;
+
+    private boolean massKillingInProgress = false;
 
     public LightningQuestMod() {
         // Register the setup method for modloading
@@ -205,8 +210,27 @@ public class LightningQuestMod
             Squad squad = squadUuidMap.get(squaduuid);
             //squad.killAllPlayers();
             //TODO: implement killing logic here
+            killSquad(squad);
             LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
         }
+    }
+
+    private void killSquad(Squad squad){
+        List<UUID> players = squad.getSquadMembers();
+        if (massKillingInProgress) {
+            return;
+        }
+        massKillingInProgress = true;
+        for (UUID pl: players ){
+            ServerPlayerEntity currentPlayer = (ServerPlayerEntity)getPlayerByUUID(pl);
+            ServerWorld currentWorld = currentPlayer.getServerWorld();
+            LightningBoltEntity currentPlayerBolt = new LightningBoltEntity(LIGHTNING_BOLT, currentWorld);
+            currentPlayerBolt.setPosition(currentPlayer.getPosX(), currentPlayer.getPosY(), currentPlayer.getPosZ());
+            //currentWorld.addEntity(currentPlayerBolt);
+            currentWorld.summonEntity(currentPlayerBolt);
+            currentPlayer.onKillCommand();
+        }
+        massKillingInProgress = false;
     }
 
     private PlayerEntity getPlayerByUUID(UUID playerUUID){
