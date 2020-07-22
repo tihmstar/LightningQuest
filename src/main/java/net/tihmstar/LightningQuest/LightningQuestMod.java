@@ -6,10 +6,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -161,13 +163,28 @@ public class LightningQuestMod
         playerLeaveSquad(event.getPlayer());
     }
 
+    @SubscribeEvent
+    public void onPlayerDeath(LivingDeathEvent event) {
+        LOGGER.info("Entity of type {} died! :( sad", event.getEntityLiving().getType());
+        if (event.getEntityLiving().getType().equals(EntityType.PLAYER)) {
+            PlayerEntity player = (PlayerEntity) event.getEntityLiving();
+            UUID squadUUID = playerToSquad.get(player.getUniqueID());
+            if (squadUUID == null) {
+                return;
+            }
+            Squad squad = squadUuidMap.get(squadUUID);
+            squad.killAllPlayers();
+            LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
+        }
+    }
+
     private void playerCreateSquad(PlayerEntity player, String name) {
         UUID squadUUID = playerToSquad.get(player.getUniqueID());
         if (squadUUID != null) {
             playerLeaveSquad(player);
         }
         for (Squad existingSquad: squadUuidMap.values()) {
-            if (existingSquad.squadName == name) {
+            if (existingSquad.squadName.equals(name)) {
                 // TODO: handle error and tell user that squad name is already in use
                 LOGGER.info("Player {} tried to create a squad {}. A squad by that name already exists!", player.getName().getString(), name);
                 return;
@@ -194,7 +211,6 @@ public class LightningQuestMod
                 return;
             }
         }
-
 
         // TODO: handle error and tell user that no squad by that name exists
     }
