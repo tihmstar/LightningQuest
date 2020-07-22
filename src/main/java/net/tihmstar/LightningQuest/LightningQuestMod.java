@@ -254,7 +254,7 @@ public class LightningQuestMod
         Squad squad = squadUuidMap.get(squadUUID);
         squad.invite(invitedPlayer);
         LOGGER.info("Player {} invited to squad {}.", invitedPlayer.getName().getString(), squad.squadName);
-        return new StringTextComponent(String.format("You were invited to the squad {}\nIs it worth joining?",squad.squad));
+        return new StringTextComponent(String.format("You were invited to the squad {}\nIs it worth joining?",squad.squadName));
     }
 
     private StringTextComponent playerSquadInfo(PlayerEntity player) {
