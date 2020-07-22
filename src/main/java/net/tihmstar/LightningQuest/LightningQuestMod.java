@@ -7,10 +7,12 @@ import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -34,6 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static net.minecraft.command.arguments.EntityArgument.getPlayers;
+import static net.minecraft.entity.EntityType.LIGHTNING_BOLT;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("lightningquest")
@@ -46,6 +49,8 @@ public class LightningQuestMod
     private static HashMap<UUID, Squad> squadUuidMap = new HashMap<UUID, Squad>();
 
     private static MinecraftServer gServer = null;
+
+    private boolean massKillingInProgress = false;
 
     public LightningQuestMod() {
         // Register the setup method for modloading
@@ -175,7 +180,7 @@ public class LightningQuestMod
                                                     pendingInvitesForPlayer.add(squad.squadName);
                                                 }
                                             }
-                                            player.sendStatusMessage(new StringTextComponent(String.format("You have pending invitations to join the following squads:%s", String.join("\n- ", pendingInvitesForPlayer))), false);
+                                            player.sendStatusMessage(new StringTextComponent(String.format("You have pending invitations to join the following squads:%s", String.join(", ", pendingInvitesForPlayer))), false);
                                             return 0;
                                         }
 
@@ -187,15 +192,11 @@ public class LightningQuestMod
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         LOGGER.info("HELLO from player logged in event! {} ({}) joined.", event.getPlayer().getName().getString(), event.getPlayer().getUniqueID());
-        // initialize squad to null
-        playerToSquad.put(event.getPlayer().getUniqueID(), null);
     }
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         LOGGER.info("HELLO from player logged out event! {} joined.", event.getPlayer().getName().getString());
-        // test if player was in squad when leaving and if so, remove player from squad.
-        playerLeaveSquad(event.getPlayer());
     }
 
     @SubscribeEvent
@@ -205,9 +206,8 @@ public class LightningQuestMod
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
 
             Squad squad = getSquadForPlayer(player);
-            if (squad != null){
-                //squad.killAllPlayers();
-                //TODO: implement killing logic here
+            if(squad != null){
+                killSquad(squad);
                 LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
             }
         }
@@ -226,6 +226,24 @@ public class LightningQuestMod
         }
     }
 
+
+    private void killSquad(Squad squad){
+        List<UUID> players = squad.getSquadMembers();
+        if (massKillingInProgress) {
+            return;
+        }
+        massKillingInProgress = true;
+        for (UUID pl: players ){
+            ServerPlayerEntity currentPlayer = (ServerPlayerEntity)getPlayerByUUID(pl);
+            ServerWorld currentWorld = currentPlayer.getServerWorld();
+            LightningBoltEntity currentPlayerBolt = new LightningBoltEntity(LIGHTNING_BOLT, currentWorld);
+            currentPlayerBolt.setPosition(currentPlayer.getPosX(), currentPlayer.getPosY(), currentPlayer.getPosZ());
+            //currentWorld.addEntity(currentPlayerBolt);
+            currentWorld.summonEntity(currentPlayerBolt);
+            currentPlayer.onKillCommand();
+        }
+        massKillingInProgress = false;
+    }
 
     private PlayerEntity getPlayerByUUID(UUID playerUUID){
         return gServer.getPlayerList().getPlayerByUUID(playerUUID);
@@ -263,7 +281,7 @@ public class LightningQuestMod
         playerToSquad.put(player.getUniqueID(), squadUUID);
         squad.join(player.getUniqueID());
         LOGGER.info("Player {} created squad {}.", player.getName().getString(), name);
-        StringTextComponent msg = new StringTextComponent(String.format("You successfully created squad %s!\nHold the burden of carrying a bunch of Idiots around",name));
+        StringTextComponent msg = new StringTextComponent(String.format("You successfully created squad %s!\nHold the burden of carrying a bunch of idiots",name));
         player.sendStatusMessage(msg, false);
     }
 
