@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
@@ -17,7 +18,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -236,6 +239,23 @@ public class LightningQuestMod
             event.setNewSpeed(event.getOriginalSpeed() * multiplier);
         }else{
             event.setNewSpeed(0);
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerLivingHurtEvent(LivingHurtEvent event) {
+        DamageSource dmgsrc = event.getSource();
+        Entity entity = dmgsrc.getTrueSource();
+        if (!(entity instanceof PlayerEntity)){
+            return;
+        }
+        PlayerEntity sourcePlayer = ((PlayerEntity)entity);
+        Squad squad = getSquadForPlayer(sourcePlayer);
+        if (squad != null) {
+            float multiplier = squad.getDamageMultiplier();
+            event.setAmount(event.getAmount() * multiplier);
+        }else{
+            event.setAmount(0);
         }
     }
 
