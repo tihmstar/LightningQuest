@@ -114,7 +114,7 @@ public class LightningQuestMod
                                             LOGGER.info("/squad invite command dispatched:\n{}", players);
 
                                             for (PlayerEntity invitedPlayer: players) {
-                                                playerInviteToSquad(invitingPlayer, invitedPlayer);
+                                                invitedPlayer.sendStatusMessage(playerInviteToSquad(invitingPlayer, invitedPlayer));
                                             }
                                             // TODO: inform player about invitation
                                             return 0;
@@ -254,7 +254,7 @@ public class LightningQuestMod
         Squad squad = squadUuidMap.get(squadUUID);
         squad.invite(invitedPlayer);
         LOGGER.info("Player {} invited to squad {}.", invitedPlayer.getName().getString(), squad.squadName);
-        return new StringTextComponent(String.format("You invited {} to your squad\nDoes he care to accept?",invitedPlayer.getName().getString()));
+        return new StringTextComponent(String.format("You were invited to the squad {}\nIs it worth joining?",squad.squad));
     }
 
     private StringTextComponent playerSquadInfo(PlayerEntity player) {
