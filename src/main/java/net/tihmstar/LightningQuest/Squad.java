@@ -15,24 +15,24 @@ public class Squad {
         this.squadName = squadName;
     }
 
-    public void join(PlayerEntity player) {
-        if (players.isEmpty() || invites.contains(player.getUniqueID())) {
-            players.add(player.getUniqueID());
-            if (invites.contains(player.getUniqueID())) {
+    public void join(UUID player) {
+        if (players.isEmpty() || invites.contains(player)) {
+            players.add(player);
+            if (invites.contains(player)){
                 // delete invitation
-                invites.remove(player.getUniqueID());
+                invites.remove(player);
             }
         }
 
     }
 
-    public void leave(PlayerEntity player) {
+    public void leave(UUID player) {
         players.remove(player);
     }
 
-    public void invite(PlayerEntity player) {
-        if (!players.contains(player.getUniqueID()) && !invites.contains(player.getUniqueID())){
-            invites.add(player.getUniqueID());
+    public void invite(UUID player) {
+        if (!players.contains(player) && !invites.contains(player)){
+            invites.add(player);
         }
     }
 

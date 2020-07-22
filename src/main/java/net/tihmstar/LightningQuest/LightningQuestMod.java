@@ -40,7 +40,9 @@ public class LightningQuestMod
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static HashMap<UUID, Squad> playerToSquad = new HashMap<UUID, Squad>();
+    private static HashMap<UUID, UUID> playerToSquad = new HashMap<UUID, UUID>();
+    private static HashMap<UUID, Squad> squadUuidMap = new HashMap<UUID, Squad>();
+
     private static MinecraftServer gServer = null;
 
     public LightningQuestMod() {
@@ -102,7 +104,7 @@ public class LightningQuestMod
                                             final String name = command.getArgument("name", String.class);
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
                                             LOGGER.info("/squad create command dispatched:\n{}", name);
-                                            player.sendStatusMessage(playerCreateSquad(player, name), false);
+                                            playerCreateSquad(player, name);
                                             return 0;
                                         })
                         )
@@ -116,9 +118,8 @@ public class LightningQuestMod
                                             LOGGER.info("/squad invite command dispatched:\n{}", players);
 
                                             for (PlayerEntity invitedPlayer: players) {
-                                                invitedPlayer.sendStatusMessage(playerInviteToSquad(invitingPlayer, invitedPlayer), false);
+                                                playerInviteToSquad(invitingPlayer, invitedPlayer);
                                             }
-                                            // TODO: inform player about invitation
                                             return 0;
                                         })
                         )
@@ -130,7 +131,7 @@ public class LightningQuestMod
                                             final String name = command.getArgument("name", String.class);
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
                                             LOGGER.info("/squad join command dispatched:\n{}", name);
-                                            player.sendStatusMessage(playerJoinSquadByName(player, name), false);
+                                            playerJoinSquadByName(player, name);
                                             return 0;
                                         })
                         )
@@ -141,7 +142,7 @@ public class LightningQuestMod
                                             LOGGER.info("/squad leave command dispatched");
                                             // current player leaves
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
-                                            player.sendStatusMessage(playerLeaveSquad(player), false);
+                                            playerLeaveSquad(player);
                                             return 0;
                                         }
 
@@ -153,7 +154,7 @@ public class LightningQuestMod
                                             LOGGER.info("/squad info command dispatched");
                                             // current player leaves
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
-                                            player.sendStatusMessage(playerSquadInfo(player), false);
+                                            playerSquadInfo(player);
                                             return 0;
                                         }
 
@@ -181,11 +182,8 @@ public class LightningQuestMod
         LOGGER.info("Entity of type {} died! :( sad", event.getEntityLiving().getType());
         if (event.getEntityLiving().getType().equals(EntityType.PLAYER)) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
-            UUID squadUUID = playerToSquad.get(player.getUniqueID());
-            if (squadUUID == null) {
-                return;
-            }
-            Squad squad = squadUuidMap.get(squadUUID);
+            UUID squaduuid = playerToSquad.get(player.getUniqueID());
+            Squad squad = squadUuidMap.get(squaduuid);
             //squad.killAllPlayers();
             //TODO: implement killing logic here
             LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
@@ -196,82 +194,105 @@ public class LightningQuestMod
         return gServer.getPlayerList().getPlayerByUUID(playerUUID);
     }
 
-    private StringTextComponent playerCreateSquad(PlayerEntity player, String name) {
-        UUID oldsquaduuid = playerToSquad.get(player);
-        if (oldsquaduuid != null) {
-            Squad oldSquad = squadUuidMap.get(oldsquaduuid);
-            return new StringTextComponent(String.format("You need to leave your old squad before you can join a new one.\n{} won't forget your betrayal!",oldSquad.squadName));
+    private void playerCreateSquad(PlayerEntity player, String name) {
+        UUID oldSquadUUID = playerToSquad.get(player);
+        if (oldSquadUUID != null) {
+            Squad oldSquad = squadUuidMap.get(oldSquadUUID);
+            StringTextComponent msg = new StringTextComponent(String.format("You need to leave your old squad before you can join a new one.\n%s won't forget your betrayal!",oldSquad.squadName));
+            player.sendStatusMessage(msg, false);
+            return;
         }
 
         for (Squad existingSquad: squadUuidMap.values()) {
             if (existingSquad.squadName.equals(name)) {
                 // TODO: handle error and tell user that squad name is already in use
                 LOGGER.info("Player {} tried to create a squad {}. A squad by that name already exists!", player.getName().getString(), name);
-                return new StringTextComponent(String.format("Squad {} already exists, but they don't want you to be part of it!",name));
+                StringTextComponent msg = new StringTextComponent(String.format("Squad %s already exists, but they don't want you to be part of it!",name));
+                player.sendStatusMessage(msg, false);
+                return;
             }
         }
         Squad squad = new Squad(name);
         UUID squadUUID = UUID.randomUUID();
         squadUuidMap.put(squadUUID, squad);
         playerToSquad.put(player.getUniqueID(), squadUUID);
-        squad.join(player);
+        squad.join(player.getUniqueID());
         LOGGER.info("Player {} created squad {}.", player.getName().getString(), name);
-        return new StringTextComponent(String.format("You successfully created squad %s!\nHold the burden of carrying a bunch of Idiots around",name));
+        StringTextComponent msg = new StringTextComponent(String.format("You successfully created squad %s!\nHold the burden of carrying a bunch of Idiots around",name));
+        player.sendStatusMessage(msg, false);
     }
 
-    private StringTextComponent playerJoinSquadByName(PlayerEntity player, String name) {
+    private void playerJoinSquadByName(PlayerEntity player, String name) {
         UUID oldsquaduuid = playerToSquad.get(player);
         if (oldsquaduuid != null) {
             Squad oldSquad = squadUuidMap.get(oldsquaduuid);
-            return new StringTextComponent(String.format("You need to leave your old squad before you can join a new one.\n%s won't forget your betrayal!",oldSquad.squadName));
+            StringTextComponent msg = new StringTextComponent(String.format("You need to leave your old squad before you can join a new one.\n%s won't forget your betrayal!",oldSquad.squadName));
+            player.sendStatusMessage(msg, false);
+            return;
         }
 
         for (Map.Entry<UUID, Squad> entry: squadUuidMap.entrySet()) {
             if (entry.getValue().squadName.equals(name)) {
-                entry.getValue().join(player);
+                entry.getValue().join(player.getUniqueID());
                 playerToSquad.put(player.getUniqueID(), entry.getKey());
                 LOGGER.info("Player {} joins squad {}.", player.getName().getString(), name);
-                return new StringTextComponent(String.format("You successfully joined %s!\nLet's hope you aren't just ballast for them",name));
+                StringTextComponent msg = new StringTextComponent(String.format("You successfully joined %s!\nLet's hope you aren't just ballast for them",name));
+                player.sendStatusMessage(msg, false);
+                return;
             }
         }
-        return new StringTextComponent(String.format("Squad %s does not exist, or doesn't want you to be part of it",name));
+        StringTextComponent msg = new StringTextComponent(String.format("Squad %s does not exist, or doesn't want you to be part of it",name));
+        player.sendStatusMessage(msg, false);
     }
 
-    private StringTextComponent playerLeaveSquad(PlayerEntity player) {
-        StringTextComponent ret = new StringTextComponent("You do not belong to a squad :(\nYou are already alone");
+    private void playerLeaveSquad(PlayerEntity player) {
         UUID squadUUID = playerToSquad.get(player.getUniqueID());
-        if (squadUUID != null) {
-            Squad squad = squadUuidMap.get(squadUUID);
-            squad.leave(player);
-            playerToSquad.remove(player.getUniqueID());
-
-            LOGGER.info("Player {} left squad {}.", player.getName().getString(), squad.squadName);
-            ret = new StringTextComponent(String.format("You left the squad %s\nGood luck on your own", squad.squadName));
-            if (squad.getNumberOfPlayers() == 0) {
-                // delete empty squad
-                LOGGER.info("Deleting empty squad {}.", squad.squadName);
-                squadUuidMap.remove(squadUUID);
-            }
+        if (squadUUID == null) {
+            StringTextComponent msg = new StringTextComponent("You do not belong to a squad :(\nYou are already alone");
+            player.sendStatusMessage(msg, false);
+            return;
         }
-        return ret;
-    }
 
-    private StringTextComponent playerInviteToSquad(PlayerEntity invitingPlayer, PlayerEntity invitedPlayer) {
-        UUID squadUUID = playerToSquad.get(invitingPlayer.getUniqueID());
         Squad squad = squadUuidMap.get(squadUUID);
-        squad.invite(invitedPlayer);
-        LOGGER.info("Player {} invited to squad {}.", invitedPlayer.getName().getString(), squad.squadName);
-        return new StringTextComponent(String.format("You were invited to the squad %s\nIs it worth joining?",squad.squadName));
+        squad.leave(player.getUniqueID());
+        playerToSquad.remove(player.getUniqueID());
+
+        LOGGER.info("Player {} left squad {}.", player.getName().getString(), squad.squadName);
+        StringTextComponent msg = new StringTextComponent(String.format("You left the squad %s\nGood luck on your own", squad.squadName));
+        player.sendStatusMessage(msg, false);
+
+        if (squad.getNumberOfPlayers() == 0) {
+            // delete empty squad
+            LOGGER.info("Deleting empty squad {}.", squad.squadName);
+            squadUuidMap.remove(squadUUID);
+        }
     }
 
-    private StringTextComponent playerSquadInfo(PlayerEntity player) {
-        StringTextComponent infostr = new StringTextComponent("You do not belong to a squad :(\nGo find some friends");
-        UUID squadUUID = playerToSquad.get(player.getUniqueID());
-        if (squadUUID != null) {
-            Squad squad = squadUuidMap.get(squadUUID);
-            infostr = new StringTextComponent("You are member of " + squad.squadName + " which has " + String.format("%d members",squad.getNumberOfPlayers()));
+    private void playerInviteToSquad(PlayerEntity invitingPlayer, PlayerEntity invitedPlayer) {
+        UUID squadUUID = playerToSquad.get(invitingPlayer);
+        if (squadUUID == null){
+            StringTextComponent errmsg = new StringTextComponent("Error 500: You don't sem to have a squad");
+            invitingPlayer.sendStatusMessage(errmsg, false);
+            return;
         }
-        return infostr;
+        Squad squad = squadUuidMap.get(squadUUID);
+        squad.invite(invitedPlayer.getUniqueID());
+        LOGGER.info("Player {} invited to squad {}.", invitedPlayer.getName().getString(), squad.squadName);
+        invitedPlayer.sendStatusMessage(new StringTextComponent(String.format("You were invited to the squad %s\nIs it worth joining?",squad.squadName)), false);
+        invitingPlayer.sendStatusMessage(new StringTextComponent(String.format("You successfully invited %s to your squad. Not your brightest idea",invitedPlayer.getName())), false);
+    }
+
+    private void playerSquadInfo(PlayerEntity player) {
+        UUID squadUUID = playerToSquad.get(player.getUniqueID());
+        if (squadUUID == null) {
+            StringTextComponent infostr = new StringTextComponent("You do not belong to a squad :(\nGo find some friends");
+            player.sendStatusMessage(infostr, false);
+            return;
+        }
+
+        Squad squad = squadUuidMap.get(squadUUID);
+        StringTextComponent infostr = new StringTextComponent(String.format("You are member of %s which has %d members",squad.squadName,squad.getNumberOfPlayers()));
+        player.sendStatusMessage(infostr, false);
     }
 
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
