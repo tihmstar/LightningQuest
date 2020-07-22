@@ -186,7 +186,8 @@ public class LightningQuestMod
                 return;
             }
             Squad squad = squadUuidMap.get(squadUUID);
-            squad.killAllPlayers();
+            //squad.killAllPlayers();
+            //TODO: implement killing logic here
             LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
         }
     }
