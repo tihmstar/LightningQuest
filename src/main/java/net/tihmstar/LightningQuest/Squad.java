@@ -11,12 +11,15 @@ public class Squad {
     public boolean massKillingInProgress = false;
     public String squadName;
 
+    public int onlineSquadPlayers = 0;
+
     public Squad(String squadName) {
         this.squadName = squadName;
     }
 
     public void join(UUID player) {
         if (players.isEmpty() || invites.contains(player)) {
+            ++onlineSquadPlayers;
             players.add(player);
             if (invites.contains(player)){
                 // delete invitation
@@ -27,6 +30,7 @@ public class Squad {
     }
 
     public void leave(UUID player) {
+        --onlineSquadPlayers;
         players.remove(player);
     }
 
@@ -63,26 +67,8 @@ public class Squad {
         massKillingInProgress = false;
     }
 
-    /*
-    // TODO: move to ligthningquestmod
-    public void killAllPlayers() {
-        // do not allow recursion to prevent infinite loop
-        // players in the same squad might kill each other indefinitely otherwise
-        if (massKillingInProgress) {
-            return;
-        }
-        massKillingInProgress = true;
-        for (PlayerEntity player: players) {
-            // kill player in squad
-            player.onKillCommand();
-        }
-        massKillingInProgress = false;
-    }
-    *
-     */
-
     public float getDamageMultiplier() {
-        switch (players.size()){
+        switch (onlineSquadPlayers){
             case 1:
                 return 0;
             case 2:

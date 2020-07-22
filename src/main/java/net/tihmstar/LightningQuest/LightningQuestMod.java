@@ -192,11 +192,19 @@ public class LightningQuestMod
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         LOGGER.info("HELLO from player logged in event! {} ({}) joined.", event.getPlayer().getName().getString(), event.getPlayer().getUniqueID());
+        Squad squad = getSquadForPlayer(event.getPlayer());
+        if (squad != null){
+            ++squad.onlineSquadPlayers;
+        }
     }
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         LOGGER.info("HELLO from player logged out event! {} joined.", event.getPlayer().getName().getString());
+        Squad squad = getSquadForPlayer(event.getPlayer());
+        if (squad != null){
+            --squad.onlineSquadPlayers;
+        }
     }
 
     @SubscribeEvent
@@ -218,7 +226,7 @@ public class LightningQuestMod
         Squad squad = getSquadForPlayer(event.getPlayer());
         if (squad != null) {
             float multiplier = squad.getDamageMultiplier();
-            LOGGER.info("onPlayerBreakSpeed with squad setting speed to %f", multiplier);
+            LOGGER.info("onPlayerBreakSpeed with squad setting speed to {}", multiplier);
             event.setNewSpeed(event.getOriginalSpeed() * multiplier);
         }else{
             LOGGER.info("onPlayerBreakSpeed no squad speed to zero");
