@@ -248,6 +248,9 @@ public class LightningQuestMod
         massKillingInProgress = true;
         for (UUID pl: players ){
             ServerPlayerEntity currentPlayer = (ServerPlayerEntity)getPlayerByUUID(pl);
+            if (currentPlayer == null) {
+                continue;
+            }
             ServerWorld currentWorld = currentPlayer.getServerWorld();
             LightningBoltEntity currentPlayerBolt = new LightningBoltEntity(LIGHTNING_BOLT, currentWorld);
             currentPlayerBolt.setPosition(currentPlayer.getPosX(), currentPlayer.getPosY(), currentPlayer.getPosZ());
