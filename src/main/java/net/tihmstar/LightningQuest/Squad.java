@@ -8,6 +8,7 @@ import java.util.*;
 public class Squad {
     private ArrayList<PlayerEntity> players = new ArrayList<>();
     private ArrayList<UUID> invites = new ArrayList<>();
+    private boolean massKillingInProgress = false;
     public String squadName;
 
     public Squad(String squadName) {
@@ -40,10 +41,17 @@ public class Squad {
     }
 
     public void killAllPlayers() {
+        // do not allow recursion to prevent infinite loop
+        // players in the same squad might kill each other indefinitely otherwise
+        if (massKillingInProgress) {
+            return;
+        }
+        massKillingInProgress = true;
         for (PlayerEntity player: players) {
             // kill player in squad
             player.onKillCommand();
         }
+        massKillingInProgress = false;
     }
 
     public double getDamageMultiplier() {
