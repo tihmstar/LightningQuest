@@ -81,8 +81,16 @@ public class Squad {
     *
      */
 
-    public double getDamageMultiplier() {
-        // TODO: implement logic to change damage by looking at squad size
-        return 1;
+    public float getDamageMultiplier() {
+        switch (players.size()){
+            case 1:
+                return 0;
+            case 2:
+                return (float) 0.5;
+            case 3:
+                return (float) 0.75;
+            default:
+                return 1;
+        }
     }
 }

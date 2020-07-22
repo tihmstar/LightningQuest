@@ -28,6 +28,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.minecraft.util.text.StringTextComponent;
 
+import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -210,6 +212,20 @@ public class LightningQuestMod
             }
         }
     }
+
+    @SubscribeEvent
+    public void onPlayerBreakSpeed(BreakSpeed event) {
+        Squad squad = getSquadForPlayer(event.getPlayer());
+        if (squad != null) {
+            float multiplier = squad.getDamageMultiplier();
+            LOGGER.info("onPlayerBreakSpeed with squad setting speed to %f", multiplier);
+            event.setNewSpeed(event.getOriginalSpeed() * multiplier);
+        }else{
+            LOGGER.info("onPlayerBreakSpeed no squad speed to zero");
+            event.setNewSpeed(0);
+        }
+    }
+
 
     private PlayerEntity getPlayerByUUID(UUID playerUUID){
         return gServer.getPlayerList().getPlayerByUUID(playerUUID);
