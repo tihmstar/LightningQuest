@@ -12,6 +12,7 @@ import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
@@ -248,7 +249,7 @@ public class LightningQuestMod
             currentPlayerBolt.setPosition(currentPlayer.getPosX(), currentPlayer.getPosY(), currentPlayer.getPosZ());
             //currentWorld.addEntity(currentPlayerBolt);
             currentWorld.summonEntity(currentPlayerBolt);
-            currentPlayer.onKillCommand();
+            currentPlayer.attackEntityFrom(new SquadDamageSource(), Float.MAX_VALUE);
         }
         massKillingInProgress = false;
     }
