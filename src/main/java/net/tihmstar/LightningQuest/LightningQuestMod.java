@@ -202,12 +202,12 @@ public class LightningQuestMod
         LOGGER.info("Entity of type {} died! :( sad", event.getEntityLiving().getType());
         if (event.getEntityLiving().getType().equals(EntityType.PLAYER)) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
-            UUID squaduuid = playerToSquad.get(player.getUniqueID());
-            Squad squad = squadUuidMap.get(squaduuid);
-            //squad.killAllPlayers();
-            //TODO: implement killing logic here
-            killSquad(squad);
-            LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
+
+            Squad squad = getSquadForPlayer(player);
+            if(squad != null){
+                killSquad(squad);
+                LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
+            }
         }
     }
 
