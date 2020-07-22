@@ -306,7 +306,7 @@ public class LightningQuestMod
         squad.invite(invitedPlayer.getUniqueID());
         LOGGER.info("Player {} invited to squad {}.", invitedPlayer.getName().getString(), squad.squadName);
         invitedPlayer.sendStatusMessage(new StringTextComponent(String.format("You were invited to the squad %s\nIs it worth joining?",squad.squadName)), false);
-        invitingPlayer.sendStatusMessage(new StringTextComponent(String.format("You successfully invited %s to your squad. Not your brightest idea",invitedPlayer.getName())), false);
+        invitingPlayer.sendStatusMessage(new StringTextComponent(String.format("You successfully invited %s to your squad. Not your brightest idea",invitedPlayer.getDisplayName())), false);
     }
 
     private void playerSquadInfo(PlayerEntity player) {
@@ -317,7 +317,16 @@ public class LightningQuestMod
             return;
         }
 
-        StringTextComponent infostr = new StringTextComponent(String.format("You are member of %s which has %d members",squad.squadName,squad.getNumberOfPlayers()));
+        String reply = String.format("You are member of %s which has %d members:",squad.squadName,squad.getNumberOfPlayers());
+
+        for (UUID playerUUID : squad.getSquadMembers()){
+            PlayerEntity squadplayer = getPlayerByUUID(playerUUID);
+            if (squadplayer != null){
+                reply += String.format("\n%s",squadplayer.getDisplayName());
+            }
+        }
+
+        StringTextComponent infostr = new StringTextComponent(reply);
         player.sendStatusMessage(infostr, false);
     }
 
