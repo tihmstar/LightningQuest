@@ -114,7 +114,7 @@ public class LightningQuestMod
                                             LOGGER.info("/squad invite command dispatched:\n{}", players);
 
                                             for (PlayerEntity invitedPlayer: players) {
-                                                invitedPlayer.sendStatusMessage(playerInviteToSquad(invitingPlayer, invitedPlayer));
+                                                invitedPlayer.sendStatusMessage(playerInviteToSquad(invitingPlayer, invitedPlayer), false);
                                             }
                                             // TODO: inform player about invitation
                                             return 0;
