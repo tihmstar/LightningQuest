@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -192,18 +193,27 @@ public class LightningQuestMod
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         LOGGER.info("HELLO from player logged in event! {} ({}) joined.", event.getPlayer().getName().getString(), event.getPlayer().getUniqueID());
+        Squad squad = getSquadForPlayer(event.getPlayer());
+        if (squad != null){
+            ++squad.onlineSquadPlayers;
+        }
     }
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         LOGGER.info("HELLO from player logged out event! {} joined.", event.getPlayer().getName().getString());
+        Squad squad = getSquadForPlayer(event.getPlayer());
+        if (squad != null){
+            --squad.onlineSquadPlayers;
+        }
     }
 
     @SubscribeEvent
     public void onPlayerDeath(LivingDeathEvent event) {
         LOGGER.info("Entity of type {} died! :( sad", event.getEntityLiving().getType());
-        if (event.getEntityLiving().getType().equals(EntityType.PLAYER)) {
-            PlayerEntity player = (PlayerEntity) event.getEntityLiving();
+        LivingEntity deadEntitiy = event.getEntityLiving();
+        if (deadEntitiy != null && deadEntitiy.getType().equals(EntityType.PLAYER)) {
+            PlayerEntity player = (PlayerEntity) deadEntitiy;
 
             Squad squad = getSquadForPlayer(player);
             if(squad != null){
