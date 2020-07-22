@@ -206,12 +206,12 @@ public class LightningQuestMod
             }
         }
         Squad squad = new Squad(name);
-        squadUUID = UUID.randomUUID();
+        UUID squadUUID = UUID.randomUUID();
         squadUuidMap.put(squadUUID, squad);
         playerToSquad.put(player.getUniqueID(), squadUUID);
         squad.join(player);
         LOGGER.info("Player {} created squad {}.", player.getName().getString(), name);
-        return new StringTextComponent(String.format("You successfully created squad {}!\nHold the burden of carrying a bunch of Idiots around",oldSquad.squadName));
+        return new StringTextComponent(String.format("You successfully created squad {}!\nHold the burden of carrying a bunch of Idiots around",name));
     }
 
     private StringTextComponent playerJoinSquadByName(PlayerEntity player, String name) {
