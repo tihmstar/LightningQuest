@@ -249,7 +249,7 @@ public class LightningQuestMod
     private Squad getSquadForPlayer(PlayerEntity player){
         UUID squaduuid = playerToSquad.get(player.getUniqueID());
         if (squaduuid != null){
-            return squadUuidMap.get(squaduuid);;
+            return squadUuidMap.get(squaduuid);
         }
         return null;
     }
