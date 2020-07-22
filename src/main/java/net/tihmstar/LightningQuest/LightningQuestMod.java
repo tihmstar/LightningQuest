@@ -9,6 +9,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -39,9 +40,8 @@ public class LightningQuestMod
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
 
-    HashMap<UUID, UUID> playerToSquad = new HashMap<UUID, UUID>();
-    HashMap<UUID, Squad> squadUuidMap = new HashMap<UUID, Squad>();
-
+    private static HashMap<UUID, Squad> playerToSquad = new HashMap<UUID, Squad>();
+    private static MinecraftServer gServer = null;
 
     public LightningQuestMod() {
         // Register the setup method for modloading
@@ -87,6 +87,8 @@ public class LightningQuestMod
     public void onServerStarting(FMLServerStartingEvent event) {
         // do something when the server starts
         LOGGER.info("HELLO from server starting");
+        gServer = event.getServer();
+
         this.registerCommands(event.getServer().getCommandManager().getDispatcher());
     }
 
@@ -187,6 +189,10 @@ public class LightningQuestMod
             squad.killAllPlayers();
             LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
         }
+    }
+
+    private PlayerEntity getPlayerByUUID(UUID playerUUID){
+        return gServer.getPlayerList().getPlayerByUUID(playerUUID);
     }
 
     private StringTextComponent playerCreateSquad(PlayerEntity player, String name) {
