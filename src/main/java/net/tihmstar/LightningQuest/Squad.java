@@ -44,6 +44,10 @@ public class Squad {
         return players;
     }
 
+    public final List<UUID> getInvites() {
+        return invites;
+    }
+
     public boolean startMassKilling() {
         /*
         returns true if this is the first member to start a mass killing

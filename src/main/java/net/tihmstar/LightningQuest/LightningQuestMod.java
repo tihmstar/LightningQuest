@@ -152,9 +152,28 @@ public class LightningQuestMod
                         Commands.literal("info")
                                 .executes(command -> {
                                             LOGGER.info("/squad info command dispatched");
-                                            // current player leaves
+                                            // current player squad info
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
                                             playerSquadInfo(player);
+                                            return 0;
+                                        }
+
+                                )
+                )
+                .then(
+                        Commands.literal("listInvites")
+                                .executes(command -> {
+                                            LOGGER.info("/squad listInvites command dispatched");
+                                            // list all squad invites of current player
+                                            final ServerPlayerEntity player = command.getSource().asPlayer();
+                                            ArrayList<String> pendingInvitesForPlayer = new ArrayList<>();
+                                            for (Squad squad: squadUuidMap.values()) {
+                                                if (squad.getInvites().contains(player.getUniqueID())){
+                                                    // player was invited to join this squad
+                                                    pendingInvitesForPlayer.add(squad.squadName);
+                                                }
+                                            }
+                                            player.sendStatusMessage(new StringTextComponent(String.format("You have pending invitations to join the following squads:%s", String.join("\n- ", pendingInvitesForPlayer))), false);
                                             return 0;
                                         }
 
