@@ -9,6 +9,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -24,6 +25,7 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -136,15 +138,26 @@ public class LightningQuestMod
                 .then(
                         Commands.literal("leave")
                                 .executes(command -> {
-                                    LOGGER.info("/squad leave command dispatched");
-                                    // current player leaves
-                                    final ServerPlayerEntity player = command.getSource().asPlayer();
-                                    playerLeaveSquad(player);
-                                    // TODO: broadcast player joining squad
-                                    return 0;
-                                }
+                                            LOGGER.info("/squad leave command dispatched");
+                                            // current player leaves
+                                            final ServerPlayerEntity player = command.getSource().asPlayer();
+                                            player.sendStatusMessage(playerLeaveSquad(player), false);
+                                            return 0;
+                                        }
 
-                        )
+                                )
+                )
+                .then(
+                        Commands.literal("info")
+                                .executes(command -> {
+                                            LOGGER.info("/squad info command dispatched");
+                                            // current player leaves
+                                            final ServerPlayerEntity player = command.getSource().asPlayer();
+                                            player.sendStatusMessage(playerSquadInfo(player), false);
+                                            return 0;
+                                        }
+
+                                )
                 )
         );
     }
@@ -178,16 +191,18 @@ public class LightningQuestMod
         }
     }
 
-    private void playerCreateSquad(PlayerEntity player, String name) {
-        UUID squadUUID = playerToSquad.get(player.getUniqueID());
-        if (squadUUID != null) {
-            playerLeaveSquad(player);
+    private StringTextComponent playerCreateSquad(PlayerEntity player, String name) {
+        UUID oldsquaduuid = playerToSquad.get(player);
+        if (oldsquaduuid != null) {
+            Squad oldSquad = squadUuidMap.get(oldsquaduuid);
+            return new StringTextComponent(String.format("You need to leave your old squad before you can join a new one.\n{} won't forget your betrayal!",oldSquad.squadName));
         }
+
         for (Squad existingSquad: squadUuidMap.values()) {
             if (existingSquad.squadName.equals(name)) {
                 // TODO: handle error and tell user that squad name is already in use
                 LOGGER.info("Player {} tried to create a squad {}. A squad by that name already exists!", player.getName().getString(), name);
-                return;
+                return new StringTextComponent(String.format("Squad {} already exists, but they don't want you to be part of it!",name));
             }
         }
         Squad squad = new Squad(name);
@@ -196,11 +211,14 @@ public class LightningQuestMod
         playerToSquad.put(player.getUniqueID(), squadUUID);
         squad.join(player);
         LOGGER.info("Player {} created squad {}.", player.getName().getString(), name);
+        return new StringTextComponent(String.format("You successfully created squad {}!\nHold the burden of carrying a bunch of Idiots around",oldSquad.squadName));
     }
 
-    private void playerJoinSquadByName(PlayerEntity player, String name) {
-        if (playerToSquad.get(player) != null) {
-            playerLeaveSquad(player);
+    private StringTextComponent playerJoinSquadByName(PlayerEntity player, String name) {
+        UUID oldsquaduuid = playerToSquad.get(player);
+        if (oldsquaduuid != null) {
+            Squad oldSquad = squadUuidMap.get(oldsquaduuid);
+            return new StringTextComponent(String.format("You need to leave your old squad before you can join a new one.\n{} won't forget your betrayal!",oldSquad.squadName));
         }
 
         for (Map.Entry<UUID, Squad> entry: squadUuidMap.entrySet()) {
@@ -208,34 +226,47 @@ public class LightningQuestMod
                 entry.getValue().join(player);
                 playerToSquad.put(player.getUniqueID(), entry.getKey());
                 LOGGER.info("Player {} joins squad {}.", player.getName().getString(), name);
-                return;
+                return new StringTextComponent(String.format("You successfully joined {}!\nLet's hope you aren't just ballast for them",name));
             }
         }
-
-        // TODO: handle error and tell user that no squad by that name exists
+        return new StringTextComponent(String.format("Squad {} does not exist, or doesn't want you to be part of it",name));
     }
 
-    private void playerLeaveSquad(PlayerEntity player) {
+    private StringTextComponent playerLeaveSquad(PlayerEntity player) {
+        StringTextComponent ret = new StringTextComponent("You do not belong to a squad :(\nYou are already alone");
         UUID squadUUID = playerToSquad.get(player.getUniqueID());
         if (squadUUID != null) {
             Squad squad = squadUuidMap.get(squadUUID);
             squad.leave(player);
             playerToSquad.remove(player.getUniqueID());
+
             LOGGER.info("Player {} left squad {}.", player.getName().getString(), squad.squadName);
+            ret = new StringTextComponent(String.format("You left the squad {}\nGood luck on your own", squad.squadName));
             if (squad.getNumberOfPlayers() == 0) {
                 // delete empty squad
                 LOGGER.info("Deleting empty squad {}.", squad.squadName);
                 squadUuidMap.remove(squadUUID);
             }
-
         }
+        return ret;
     }
 
-    private void playerInviteToSquad(PlayerEntity invitingPlayer, PlayerEntity invitedPlayer) {
+    private StringTextComponent playerInviteToSquad(PlayerEntity invitingPlayer, PlayerEntity invitedPlayer) {
         UUID squadUUID = playerToSquad.get(invitingPlayer.getUniqueID());
         Squad squad = squadUuidMap.get(squadUUID);
         squad.invite(invitedPlayer);
         LOGGER.info("Player {} invited to squad {}.", invitedPlayer.getName().getString(), squad.squadName);
+        return new StringTextComponent(String.format("You invited {} to your squad\nDoes he care to accept?",invitedPlayer.getName().getString()));
+    }
+
+    private StringTextComponent playerSquadInfo(PlayerEntity player) {
+        StringTextComponent infostr = new StringTextComponent("You do not belong to a squad :(\nGo find some friends");
+        UUID squadUUID = playerToSquad.get(player.getUniqueID());
+        if (squadUUID != null) {
+            Squad squad = squadUuidMap.get(squadUUID);
+            infostr = new StringTextComponent("You are member of " + squad.squadName + " which has " + String.format("%d members",squad.getNumberOfPlayers()));
+        }
+        return infostr;
     }
 
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
