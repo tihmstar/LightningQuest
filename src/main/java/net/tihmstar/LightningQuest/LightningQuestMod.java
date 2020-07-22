@@ -45,8 +45,8 @@ public class LightningQuestMod
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static HashMap<UUID, UUID> playerToSquad = new HashMap<UUID, UUID>();
-    private static HashMap<UUID, Squad> squadUuidMap = new HashMap<UUID, Squad>();
+    private static HashMap<UUID, UUID> playerToSquad = new HashMap<>();
+    private static HashMap<UUID, Squad> squadUuidMap = new HashMap<>();
 
     private static MinecraftServer gServer = null;
 
@@ -218,10 +218,8 @@ public class LightningQuestMod
         Squad squad = getSquadForPlayer(event.getPlayer());
         if (squad != null) {
             float multiplier = squad.getDamageMultiplier();
-            LOGGER.info("onPlayerBreakSpeed with squad setting speed to %f", multiplier);
             event.setNewSpeed(event.getOriginalSpeed() * multiplier);
         }else{
-            LOGGER.info("onPlayerBreakSpeed no squad speed to zero");
             event.setNewSpeed(0);
         }
     }
@@ -229,10 +227,9 @@ public class LightningQuestMod
 
     private void killSquad(Squad squad){
         List<UUID> players = squad.getSquadMembers();
-        if (massKillingInProgress) {
+        if(!squad.startMassKilling()){
             return;
         }
-        massKillingInProgress = true;
         for (UUID pl: players ){
             ServerPlayerEntity currentPlayer = (ServerPlayerEntity)getPlayerByUUID(pl);
             ServerWorld currentWorld = currentPlayer.getServerWorld();
@@ -242,7 +239,7 @@ public class LightningQuestMod
             currentWorld.summonEntity(currentPlayerBolt);
             currentPlayer.onKillCommand();
         }
-        massKillingInProgress = false;
+        squad.stopMassKilling();
     }
 
     private PlayerEntity getPlayerByUUID(UUID playerUUID){
@@ -252,8 +249,7 @@ public class LightningQuestMod
     private Squad getSquadForPlayer(PlayerEntity player){
         UUID squaduuid = playerToSquad.get(player.getUniqueID());
         if (squaduuid != null){
-            Squad squad = squadUuidMap.get(squaduuid);
-            return squad;
+            return squadUuidMap.get(squaduuid);;
         }
         return null;
     }
