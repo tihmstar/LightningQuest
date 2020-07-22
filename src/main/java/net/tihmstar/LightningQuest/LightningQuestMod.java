@@ -46,7 +46,7 @@ import static net.minecraft.entity.EntityType.LIGHTNING_BOLT;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("lightningquest")
-public class LightningQuestMod
+public class LightningQuest
 {
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
@@ -58,7 +58,7 @@ public class LightningQuestMod
 
     private boolean massKillingInProgress = false;
 
-    public LightningQuestMod() {
+    public LightningQuest() {
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         // Register the enqueueIMC method for modloading
