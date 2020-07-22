@@ -181,7 +181,11 @@ public class LightningQuestMod
                                                     pendingInvitesForPlayer.add(squad.squadName);
                                                 }
                                             }
-                                            player.sendStatusMessage(new StringTextComponent(String.format("You have pending invitations to join the following squads:%s", String.join(", ", pendingInvitesForPlayer))), false);
+                                            if(pendingInvitesForPlayer.isEmpty()) {
+                                                player.sendStatusMessage(new StringTextComponent("You have no pending invitations. It seems like you have 0 friends."), false);
+                                            }else{
+                                                player.sendStatusMessage(new StringTextComponent(String.format("You have pending invitations to join the following squads:%s", String.join(", ", pendingInvitesForPlayer))), false);
+                                            }
                                             return 0;
                                         }
 
