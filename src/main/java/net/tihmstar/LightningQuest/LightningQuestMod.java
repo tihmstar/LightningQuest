@@ -307,8 +307,17 @@ public class LightningQuestMod
         }
 
         for (Map.Entry<UUID, Squad> entry: squadUuidMap.entrySet()) {
-            if (entry.getValue().squadName.equals(name)) {
-                entry.getValue().join(player.getUniqueID());
+            Squad squad = entry.getValue();
+            if (squad.squadName.equals(name)) {
+                for (UUID spuuid : squad.getSquadMembers()){
+                    PlayerEntity sqp = getPlayerByUUID(spuuid);
+                    if (sqp != null){
+                        StringTextComponent smsg = new StringTextComponent(String.format("An idiot called %s joined your squad",player.getName().getString()));
+                        sqp.sendStatusMessage(smsg, false);
+                    }
+                }
+
+                squad.join(player.getUniqueID());
                 playerToSquad.put(player.getUniqueID(), entry.getKey());
                 LOGGER.info("Player {} joins squad {}.", player.getName().getString(), name);
                 StringTextComponent msg = new StringTextComponent(String.format("You successfully joined %s!\nLet's hope you aren't just ballast for them",name));
