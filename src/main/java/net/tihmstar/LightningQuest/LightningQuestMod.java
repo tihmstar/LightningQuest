@@ -184,14 +184,14 @@ public class LightningQuestMod
 
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        LOGGER.info("HELLO from player logged in event! {} ({}) joined.", event.getPlayer().getDisplayName(), event.getPlayer().getUniqueID());
+        LOGGER.info("HELLO from player logged in event! {} ({}) joined.", event.getPlayer().getName().getString(), event.getPlayer().getUniqueID());
         // initialize squad to null
         playerToSquad.put(event.getPlayer().getUniqueID(), null);
     }
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        LOGGER.info("HELLO from player logged out event! {} joined.", event.getPlayer().getDisplayName());
+        LOGGER.info("HELLO from player logged out event! {} joined.", event.getPlayer().getName().getString());
         // test if player was in squad when leaving and if so, remove player from squad.
         playerLeaveSquad(event.getPlayer());
     }
@@ -306,7 +306,7 @@ public class LightningQuestMod
         squad.invite(invitedPlayer.getUniqueID());
         LOGGER.info("Player {} invited to squad {}.", invitedPlayer.getName().getString(), squad.squadName);
         invitedPlayer.sendStatusMessage(new StringTextComponent(String.format("You were invited to the squad %s\nIs it worth joining?",squad.squadName)), false);
-        invitingPlayer.sendStatusMessage(new StringTextComponent(String.format("You successfully invited %s to your squad. Not your brightest idea",invitedPlayer.getDisplayName())), false);
+        invitingPlayer.sendStatusMessage(new StringTextComponent(String.format("You successfully invited %s to your squad. Not your brightest idea",invitedPlayer.getName().getString())), false);
     }
 
     private void playerSquadInfo(PlayerEntity player) {
@@ -322,7 +322,7 @@ public class LightningQuestMod
         for (UUID playerUUID : squad.getSquadMembers()){
             PlayerEntity squadplayer = getPlayerByUUID(playerUUID);
             if (squadplayer != null){
-                reply += String.format("\n%s",squadplayer.getDisplayName());
+                reply += String.format("\n%s",squadplayer.getName().getString());
             }
         }
 
