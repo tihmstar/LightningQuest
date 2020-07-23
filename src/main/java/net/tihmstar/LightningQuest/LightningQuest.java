@@ -49,7 +49,7 @@ import static net.minecraft.entity.EntityType.LIGHTNING_BOLT;
 public class LightningQuest
 {
     // Directly reference a log4j logger.
-    private static final Logger LOGGER = LogManager.getLogger();
+    //private static final Logger LOGGER = LogManager.getLogger();
 
     private static HashMap<UUID, UUID> playerToSquad = new HashMap<UUID, UUID>();
     private static HashMap<UUID, Squad> squadUuidMap = new HashMap<UUID, Squad>();
@@ -59,6 +59,7 @@ public class LightningQuest
     private boolean massKillingInProgress = false;
 
     public LightningQuest() {
+        /*
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         // Register the enqueueIMC method for modloading
@@ -67,41 +68,44 @@ public class LightningQuest
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
         // Register the doClientStuff method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
-
+        */
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
     }
 
+    /*
     private void setup(final FMLCommonSetupEvent event)
     {
         // some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
-        LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        //LOGGER.info("HELLO FROM PREINIT");
+        //LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
         // do something that can only be done on the client
-        LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().gameSettings);
+        //LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().gameSettings);
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event)
     {
         // some example code to dispatch IMC to another mod
-        InterModComms.sendTo("lightningquest", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
+        InterModComms.sendTo("lightningquest", "helloworld", () -> { //LOGGER.info("Hello world from the MDK"); return "Hello world";});
     }
 
     private void processIMC(final InterModProcessEvent event)
     {
         // some example code to receive and process InterModComms from other mods
-        LOGGER.info("Got IMC {}", event.getIMCStream().
+        //LOGGER.info("Got IMC {}", event.getIMCStream().
                 map(m->m.getMessageSupplier().get()).
                 collect(Collectors.toList()));
     }
+    */
+
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
         // do something when the server starts
-        LOGGER.info("HELLO from server starting");
+        //LOGGER.info("HELLO from server starting");
         gServer = event.getServer();
 
         this.registerCommands(event.getServer().getCommandManager().getDispatcher());
@@ -116,7 +120,7 @@ public class LightningQuest
                                         .executes(command -> {
                                             final String name = command.getArgument("name", String.class);
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
-                                            LOGGER.info("/squad create command dispatched:\n{}", name);
+                                            //LOGGER.info("/squad create command dispatched:\n{}", name);
                                             playerCreateSquad(player, name);
                                             return 0;
                                         })
@@ -128,7 +132,7 @@ public class LightningQuest
                                         .executes(command -> {
                                             Collection<ServerPlayerEntity> players = getPlayers(command, "players");
                                             final ServerPlayerEntity invitingPlayer = command.getSource().asPlayer();
-                                            LOGGER.info("/squad invite command dispatched:\n{}", players);
+                                            //LOGGER.info("/squad invite command dispatched:\n{}", players);
 
                                             for (PlayerEntity invitedPlayer: players) {
                                                 playerInviteToSquad(invitingPlayer, invitedPlayer);
@@ -143,7 +147,7 @@ public class LightningQuest
                                         .executes(command -> {
                                             final String name = command.getArgument("name", String.class);
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
-                                            LOGGER.info("/squad join command dispatched:\n{}", name);
+                                            //LOGGER.info("/squad join command dispatched:\n{}", name);
                                             playerJoinSquadByName(player, name);
                                             return 0;
                                         })
@@ -152,7 +156,7 @@ public class LightningQuest
                 .then(
                         Commands.literal("leave")
                                 .executes(command -> {
-                                            LOGGER.info("/squad leave command dispatched");
+                                            //LOGGER.info("/squad leave command dispatched");
                                             // current player leaves
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
                                             playerLeaveSquad(player);
@@ -164,7 +168,7 @@ public class LightningQuest
                 .then(
                         Commands.literal("info")
                                 .executes(command -> {
-                                            LOGGER.info("/squad info command dispatched");
+                                            //LOGGER.info("/squad info command dispatched");
                                             // current player squad info
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
                                             playerSquadInfo(player);
@@ -176,7 +180,7 @@ public class LightningQuest
                 .then(
                         Commands.literal("listInvites")
                                 .executes(command -> {
-                                            LOGGER.info("/squad listInvites command dispatched");
+                                            //LOGGER.info("/squad listInvites command dispatched");
                                             // list all squad invites of current player
                                             final ServerPlayerEntity player = command.getSource().asPlayer();
                                             ArrayList<String> pendingInvitesForPlayer = new ArrayList<>();
@@ -201,7 +205,7 @@ public class LightningQuest
 
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        LOGGER.info("HELLO from player logged in event! {} ({}) joined.", event.getPlayer().getName().getString(), event.getPlayer().getUniqueID());
+        //LOGGER.info("HELLO from player logged in event! {} ({}) joined.", event.getPlayer().getName().getString(), event.getPlayer().getUniqueID());
         Squad squad = getSquadForPlayer(event.getPlayer());
         if (squad != null){
             ++squad.onlineSquadPlayers;
@@ -210,7 +214,7 @@ public class LightningQuest
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        LOGGER.info("HELLO from player logged out event! {} joined.", event.getPlayer().getName().getString());
+        //LOGGER.info("HELLO from player logged out event! {} joined.", event.getPlayer().getName().getString());
         Squad squad = getSquadForPlayer(event.getPlayer());
         if (squad != null){
             --squad.onlineSquadPlayers;
@@ -219,7 +223,7 @@ public class LightningQuest
 
     @SubscribeEvent
     public void onPlayerDeath(LivingDeathEvent event) {
-        LOGGER.info("Entity of type {} died! :( sad", event.getEntityLiving().getType());
+        //LOGGER.info("Entity of type {} died! :( sad", event.getEntityLiving().getType());
         LivingEntity deadEntitiy = event.getEntityLiving();
         if (deadEntitiy != null && deadEntitiy.getType().equals(EntityType.PLAYER)) {
             PlayerEntity player = (PlayerEntity) deadEntitiy;
@@ -227,11 +231,12 @@ public class LightningQuest
             Squad squad = getSquadForPlayer(player);
             if(squad != null){
                 killSquad(squad);
-                LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
+                //LOGGER.info("Killed all player of squad {}! :( very sad", squad.squadName);
             }
         }
     }
 
+    /*
     @SubscribeEvent
     public void onPlayerBreakSpeed(BreakSpeed event) {
         Squad squad = getSquadForPlayer(event.getPlayer());
@@ -242,6 +247,7 @@ public class LightningQuest
             event.setNewSpeed(0);
         }
     }
+    */
 
     @SubscribeEvent
     public void onPlayerLivingHurtEvent(LivingHurtEvent event) {
@@ -309,8 +315,7 @@ public class LightningQuest
 
         for (Squad existingSquad: squadUuidMap.values()) {
             if (existingSquad.squadName.equals(name)) {
-                // TODO: handle error and tell user that squad name is already in use
-                LOGGER.info("Player {} tried to create a squad {}. A squad by that name already exists!", player.getName().getString(), name);
+                //LOGGER.info("Player {} tried to create a squad {}. A squad by that name already exists!", player.getName().getString(), name);
 
                 String s = "Squad ";
                 s+= TextFormatting.GREEN + name + TextFormatting.RESET;
@@ -326,7 +331,7 @@ public class LightningQuest
         squadUuidMap.put(squadUUID, squad);
         playerToSquad.put(player.getUniqueID(), squadUUID);
         squad.join(player.getUniqueID());
-        LOGGER.info("Player {} created squad {}.", player.getName().getString(), name);
+        //LOGGER.info("Player {} created squad {}.", player.getName().getString(), name);
 
         String s = "You successfully created squad ";
         s += TextFormatting.GREEN + name + TextFormatting.RESET;
@@ -364,7 +369,7 @@ public class LightningQuest
 
                 squad.join(player.getUniqueID());
                 playerToSquad.put(player.getUniqueID(), entry.getKey());
-                LOGGER.info("Player {} joins squad {}.", player.getName().getString(), name);
+                //LOGGER.info("Player {} joins squad {}.", player.getName().getString(), name);
 
                 String s = "You successfully joined ";
                 s += TextFormatting.GREEN + name + TextFormatting.RESET;
@@ -396,7 +401,7 @@ public class LightningQuest
         squad.leave(player.getUniqueID());
         playerToSquad.remove(player.getUniqueID());
 
-        LOGGER.info("Player {} left squad {}.", player.getName().getString(), squad.squadName);
+        //LOGGER.info("Player {} left squad {}.", player.getName().getString(), squad.squadName);
 
         String s = "You left the squad ";
         s += TextFormatting.GREEN + squad.squadName + TextFormatting.RESET;
@@ -407,7 +412,7 @@ public class LightningQuest
 
         if (squad.getNumberOfPlayers() == 0) {
             // delete empty squad
-            LOGGER.info("Deleting empty squad {}.", squad.squadName);
+            //LOGGER.info("Deleting empty squad {}.", squad.squadName);
             squadUuidMap.remove(squadUUID);
         }
     }
@@ -420,7 +425,7 @@ public class LightningQuest
             return;
         }
         squad.invite(invitedPlayer.getUniqueID());
-        LOGGER.info("Player {} invited to squad {}.", invitedPlayer.getName().getString(), squad.squadName);
+        //LOGGER.info("Player {} invited to squad {}.", invitedPlayer.getName().getString(), squad.squadName);
 
         {
             String s = TextFormatting.RED + invitingPlayer.getName().getString() + TextFormatting.RESET;
@@ -471,6 +476,7 @@ public class LightningQuest
         player.sendStatusMessage(infostr, false);
     }
 
+    /*
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
     // Event bus for receiving Registry Events)
     @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
@@ -478,7 +484,8 @@ public class LightningQuest
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // register a new block here
-            LOGGER.info("HELLO from Register Block");
+            //LOGGER.info("HELLO from Register Block");
         }
     }
+    */
 }
