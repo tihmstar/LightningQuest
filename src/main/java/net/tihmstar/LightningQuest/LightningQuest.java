@@ -618,6 +618,27 @@ public class LightningQuest
         }
     }
 
+    private ServerPlayerEntity getNearestEnemyPlayer(ServerPlayerEntity me){
+        ServerPlayerEntity nearestEnemy = me;
+        float nearestDistance = Float.MAX_VALUE;
+
+        Squad s = getSquadForPlayer(me);
+        if (s != null){
+            for (ServerPlayerEntity p : gServer.getPlayerList().getPlayers()){
+                if (p.getServerWorld() != me.getServerWorld()) continue; //only works in same dimension
+
+                if (s.getSquadMembers().contains(p.getUniqueID())) continue; //ignore squad members
+
+                float pdistance = me.getDistance(p);
+                if (pdistance < nearestDistance){
+                    nearestDistance = pdistance;
+                    nearestEnemy = p;
+                }
+            }
+        }
+
+        return nearestEnemy;
+    }
 
     /*
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
