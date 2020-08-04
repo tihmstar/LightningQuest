@@ -1,5 +1,9 @@
 package net.tihmstar.LightningQuest;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.block.Block;
@@ -14,6 +18,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.JSONUtils;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.server.ServerWorld;
@@ -31,6 +36,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.LogManager;
@@ -105,12 +112,61 @@ public class LightningQuest
     }
     */
 
+    public void unserializeFromJson(JsonObject obj){
+
+        {
+            HashMap<UUID, UUID> lplayerToSquad = new HashMap<UUID, UUID>();
+            JsonObject playerToSquadObj = obj.get("playerToSquad").getAsJsonObject();
+            for (Map.Entry<String, JsonElement> pts : playerToSquadObj.entrySet()){
+                UUID playeruuid = UUID.fromString(pts.getKey());
+                UUID squaduuid = UUID.fromString(pts.getValue().getAsString());
+                lplayerToSquad.put(playeruuid,squaduuid);
+            }
+            playerToSquad = lplayerToSquad;
+        }
+
+        {
+            HashMap<UUID, Squad> lsquadUuidMap = new HashMap<UUID, Squad>();
+            JsonObject squadUuidMapObj = obj.get("squadUuidMap").getAsJsonObject();
+            for (Map.Entry<String, JsonElement> sum : squadUuidMapObj.entrySet()){
+                UUID squaduuid = UUID.fromString(sum.getKey());
+                Squad squadval = new Squad(sum.getValue().getAsJsonObject());
+                lsquadUuidMap.put(squaduuid,squadval);
+            }
+            squadUuidMap = lsquadUuidMap;
+        }
+    }
+
+    public JsonObject serializeToJson(){
+        JsonObject ret = new JsonObject();
+
+        {
+            JsonObject playerToSquadObj = new JsonObject();
+            for (UUID p : playerToSquad.keySet()) playerToSquadObj.add(p.toString(),new JsonPrimitive(playerToSquad.get(p).toString()));
+            ret.add("playerToSquad", playerToSquadObj);
+        }
+
+        {
+            JsonObject squadUuidMapObj = new JsonObject();
+            for (UUID su : squadUuidMap.keySet()) squadUuidMapObj.add(su.toString(),squadUuidMap.get(su).serializeToJson());
+            ret.add("squadUuidMap",squadUuidMapObj);
+        }
+
+        return ret;
+    }
+
+    public String serializeToJsonString(){
+        return serializeToJson().toString();
+    }
+
+
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
         // do something when the server starts
         //LOGGER.info("HELLO from server starting");
         gServer = event.getServer();
+
 
         this.registerCommands(event.getServer().getCommandManager().getDispatcher());
     }

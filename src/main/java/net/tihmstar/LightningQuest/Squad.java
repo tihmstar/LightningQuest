@@ -1,5 +1,9 @@
 package net.tihmstar.LightningQuest;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.event.world.NoteBlockEvent;
@@ -8,17 +12,82 @@ import java.time.Instant;
 import java.util.*;
 
 public class Squad {
+    public String squadName;
     private ArrayList<UUID> players = new ArrayList<>();
     private ArrayList<UUID> invites = new ArrayList<>();
-    public boolean massKillingInProgress = false;
-    public String squadName;
-    public int onlineSquadPlayers = 0;
-    public HashMap<UUID, Long> playersLastTeleport = new HashMap<UUID, Long>();
+    private HashMap<UUID, Long> playersLastTeleport = new HashMap<UUID, Long>();
 
-    private long teleportTimeout = 300;//seconds
+    public boolean massKillingInProgress = false;
+    public int onlineSquadPlayers = 0;
+
+    final private long teleportTimeout = 300;//seconds
 
     public Squad(String squadName) {
         this.squadName = squadName;
+    }
+
+    public Squad(JsonObject obj){
+        //unserialize from json obj
+
+        squadName = obj.get("squadName").getAsString();
+
+        {
+            ArrayList<UUID> lplayers = new ArrayList<>();
+            JsonArray playersObj = obj.get("players").getAsJsonArray();
+            for (JsonElement pe : playersObj){
+                String ps = pe.getAsString();
+                lplayers.add(UUID.fromString(ps));
+            }
+            players = lplayers;
+        }
+
+        {
+            ArrayList<UUID> linvites = new ArrayList<>();
+            JsonArray invitesObj = obj.get("invites").getAsJsonArray();
+            for (JsonElement ie : invitesObj){
+                String is = ie.getAsString();
+                linvites.add(UUID.fromString(is));
+            }
+            invites = linvites;
+        }
+
+        {
+            HashMap<UUID, Long> lplayersLastTeleport = new HashMap<UUID, Long>();
+            JsonObject playersLastTeleportObj = obj.get("playersLastTeleport").getAsJsonObject();
+            for (Map.Entry<String, JsonElement> plt : playersLastTeleportObj.entrySet()){
+                UUID playeruuid = UUID.fromString(plt.getKey());
+                Long tpdate = plt.getValue().getAsLong();
+                lplayersLastTeleport.put(playeruuid,tpdate);
+            }
+            playersLastTeleport = lplayersLastTeleport;
+        }
+
+    }
+
+    public JsonObject serializeToJson(){
+        JsonObject ret = new JsonObject();
+
+        ret.add("squadName", new JsonPrimitive(squadName));
+
+        {
+            JsonArray playersObj = new JsonArray();
+            for (UUID p : players) playersObj.add(p.toString());
+            ret.add("players",playersObj);
+        }
+
+        {
+            JsonArray invitesObj = new JsonArray();
+            for (UUID i : invites) invitesObj.add(i.toString());
+            ret.add("invites",invitesObj);
+        }
+
+        {
+            JsonObject playersLastTeleportObj = new JsonObject();
+            for (UUID p : playersLastTeleport.keySet()) playersLastTeleportObj.add(p.toString(),new JsonPrimitive(playersLastTeleport.get(p).toString()));
+            ret.add("playersLastTeleport",playersLastTeleportObj);
+        }
+
+        return ret;
     }
 
     public void join(UUID player) {
