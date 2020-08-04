@@ -287,7 +287,7 @@ public class LightningQuest
         if (dstEntity instanceof PlayerEntity){
             //do low health notification
             PlayerEntity dstPlayer = (PlayerEntity)dstEntity;
-            if (dstPlayer.getHealth() < playerLowHealthNotificationThreashold){
+            if (dstPlayer.getHealth() <= playerLowHealthNotificationThreashold){
                 Squad squad = getSquadForPlayer(dstPlayer);
                 if (squad != null){
                     //notify squad
