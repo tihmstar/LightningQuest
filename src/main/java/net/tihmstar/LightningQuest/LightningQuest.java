@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import it.unimi.dsi.fastutil.Hash;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
@@ -16,9 +17,13 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.CompassItem;
+import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Hand;
 import net.minecraft.util.JSONUtils;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.server.ServerWorld;
@@ -64,6 +69,8 @@ public class LightningQuest
 
     private static HashMap<UUID, UUID> playerToSquad = new HashMap<UUID, UUID>();
     private static HashMap<UUID, Squad> squadUuidMap = new HashMap<UUID, Squad>();
+
+    private static HashMap<UUID, Vector3d> playersNearestEnemy = new HashMap<UUID, Vector3d>();
 
     private static MinecraftServer gServer = null;
 
@@ -274,25 +281,52 @@ public class LightningQuest
                                         })
                         )
                 )
+                .then(
+                        Commands.literal("test")
+                                .executes(command -> {
+                                            //LOGGER.info("/squad info command dispatched");
+                                            // current player squad info
+                                            final ServerPlayerEntity player = command.getSource().asPlayer();
+
+                                            Item itm = player.getHeldItem(Hand.MAIN_HAND).getItem();
+                                            if (!(itm instanceof CompassItem)) return 0;
+                                            CompassItem compass = (CompassItem)itm;
+
+                                            String msg = "you are holding a compass";
+                                            player.sendStatusMessage(new StringTextComponent(msg),false);
+
+                                            return 0;
+                                        }
+
+                                )
+                )
         );
     }
 
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         //LOGGER.info("HELLO from player logged in event! {} ({}) joined.", event.getPlayer().getName().getString(), event.getPlayer().getUniqueID());
-        Squad squad = getSquadForPlayer(event.getPlayer());
+        PlayerEntity player = event.getPlayer();
+        Squad squad = getSquadForPlayer(player);
         if (squad != null){
             ++squad.onlineSquadPlayers;
         }
+
+        //on server join the compass points to where you joined the server
+        playersNearestEnemy.put(player.getUniqueID(),player.getPositionVec());
     }
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         //LOGGER.info("HELLO from player logged out event! {} joined.", event.getPlayer().getName().getString());
-        Squad squad = getSquadForPlayer(event.getPlayer());
+        PlayerEntity player = event.getPlayer();
+        Squad squad = getSquadForPlayer(player);
         if (squad != null){
             --squad.onlineSquadPlayers;
         }
+
+        //on server leave delete nearest enemy hint
+        playersNearestEnemy.remove(player.getUniqueID());
     }
 
     @SubscribeEvent
@@ -623,14 +657,14 @@ public class LightningQuest
         float nearestDistance = Float.MAX_VALUE;
 
         Squad s = getSquadForPlayer(me);
-        if (s != null){
-            for (ServerPlayerEntity p : gServer.getPlayerList().getPlayers()){
+        if (s != null) {
+            for (ServerPlayerEntity p : gServer.getPlayerList().getPlayers()) {
                 if (p.getServerWorld() != me.getServerWorld()) continue; //only works in same dimension
 
                 if (s.getSquadMembers().contains(p.getUniqueID())) continue; //ignore squad members
 
                 float pdistance = me.getDistance(p);
-                if (pdistance < nearestDistance){
+                if (pdistance < nearestDistance) {
                     nearestDistance = pdistance;
                     nearestEnemy = p;
                 }
