@@ -32,6 +32,7 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.minecraft.util.text.StringTextComponent;
@@ -211,7 +212,7 @@ public class LightningQuest
                                             final ServerPlayerEntity sourcePlayer = command.getSource().asPlayer();
                                             final ServerPlayerEntity destinationPlayer = players.iterator().next();
 
-                                            playerTeleportToPlayer(sourcePlayer, destinationPlayer);
+                                            teleportPlayer(sourcePlayer, destinationPlayer);
 
                                             return 0;
                                         })
@@ -321,6 +322,45 @@ public class LightningQuest
             currentPlayer.attackEntityFrom(new SquadDamageSource(), Float.MAX_VALUE);
         }
         massKillingInProgress = false;
+    }
+
+    private void teleportPlayer(ServerPlayerEntity playerReq, ServerPlayerEntity playerDest){
+        ServerWorld requesterWorld = playerReq.getServerWorld();
+        ServerWorld destWorld = playerDest.getServerWorld();
+        Squad reqSquad = getSquadForPlayer(playerReq);
+        Squad destSquad = getSquadForPlayer(playerDest);
+
+        if(reqSquad == null){
+            StringTextComponent msg = new StringTextComponent("Teleport failed; you are not in a squad");
+            playerReq.sendStatusMessage(msg, false);
+            return;
+        }
+
+        if((reqSquad != destSquad) || (destSquad == null)){
+            String error = "Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Player not in same Squad!";
+            if(reqSquad != null){
+                setSquadChat(reqSquad, error);
+            }
+            return;
+        }
+
+        if(reqSquad != null){
+            if(!reqSquad.playerCanDoTeleport(playerReq.getUniqueID())){
+                String error = "Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Cooldown active!";
+                setSquadChat(reqSquad, error);
+                return;
+            }
+        }
+        if(requesterWorld!= destWorld){
+            String error = "Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Worlds aren't identical!";
+            //LOGGER.debug("Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Worlds aren't identical!");
+            //Squad playersquad = getSquadForPlayer(playerReq); für sendsquatchat...
+            if(reqSquad != null){
+                setSquadChat(reqSquad, error);
+            }
+            return;
+        }
+        playerReq.teleport(destWorld, playerDest.getPosX(), playerDest.getPosY(), playerDest.getPosZ(), playerDest.cameraYaw, playerDest.rotationPitch);
     }
 
     private PlayerEntity getPlayerByUUID(UUID playerUUID){
