@@ -316,7 +316,7 @@ public class LightningQuest
         }
 
         if((reqSquad != destSquad) || (destSquad == null)){
-            String error = "Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Player not in same Squad!";
+            String error = "Cannot Teleport Player " + TextFormatting.RED +playerReq.getName().getString()+ TextFormatting.RESET+ " to " + TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET +"; Player not in same Squad!";
             if(reqSquad != null){
                 setSquadChat(reqSquad, error);
             }
@@ -325,13 +325,13 @@ public class LightningQuest
 
         if(reqSquad != null){
             if(!reqSquad.playerCanDoTeleport(playerReq.getUniqueID())){
-                String error = "Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Cooldown active!";
+                String error = "Cannot Teleport Player " + TextFormatting.RED +playerReq.getName().getString()+ TextFormatting.RESET+ " to " + TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET +"; Cooldown active!";
                 setSquadChat(reqSquad, error);
                 return;
             }
         }
         if(requesterWorld!= destWorld){
-            String error = "Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Worlds aren't identical!";
+            String error = "Cannot Teleport Player " + TextFormatting.RED +playerReq.getName().getString()+ TextFormatting.RESET+ " to " + TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET +"; Player is in another Dimension!";
             //LOGGER.debug("Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Worlds aren't identical!");
             //Squad playersquad = getSquadForPlayer(playerReq); für sendsquatchat...
             if(reqSquad != null){
