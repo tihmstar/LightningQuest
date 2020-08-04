@@ -327,40 +327,41 @@ public class LightningQuest
     private void teleportPlayer(ServerPlayerEntity playerReq, ServerPlayerEntity playerDest){
         ServerWorld requesterWorld = playerReq.getServerWorld();
         ServerWorld destWorld = playerDest.getServerWorld();
+
         Squad reqSquad = getSquadForPlayer(playerReq);
-        Squad destSquad = getSquadForPlayer(playerDest);
 
         if(reqSquad == null){
-            StringTextComponent msg = new StringTextComponent("Teleport failed; you are not in a squad");
+            StringTextComponent msg = new StringTextComponent("Teleport failed. Go find some friends first");
             playerReq.sendStatusMessage(msg, false);
             return;
         }
 
-        if((reqSquad != destSquad) || (destSquad == null)){
-            String error = "Cannot Teleport Player " + TextFormatting.RED +playerReq.getName().getString()+ TextFormatting.RESET+ " to " + TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET +"; Player not in same Squad!";
-            if(reqSquad != null){
-                setSquadChat(reqSquad, error);
-            }
+        if (!reqSquad.getSquadMembers().contains(playerDest.getUniqueID())){
+            String s = "Failed to teleport to ";
+            s += TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET;
+            s += " because the player is not in the same quad. You traitor!";
+            playerReq.sendStatusMessage(new StringTextComponent(s), false);
             return;
         }
 
-        if(reqSquad != null){
-            if(!reqSquad.playerCanDoTeleport(playerReq.getUniqueID())){
-                String error = "Cannot Teleport Player " + TextFormatting.RED +playerReq.getName().getString()+ TextFormatting.RESET+ " to " + TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET +"; Cooldown active!";
-                setSquadChat(reqSquad, error);
-                return;
-            }
-        }
-        if(requesterWorld!= destWorld){
-            String error = "Cannot Teleport Player " + TextFormatting.RED +playerReq.getName().getString()+ TextFormatting.RESET+ " to " + TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET +"; Player is in another Dimension!";
-            //LOGGER.debug("Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Worlds aren't identical!");
-            //Squad playersquad = getSquadForPlayer(playerReq); für sendsquatchat...
-            if(reqSquad != null){
-                setSquadChat(reqSquad, error);
-            }
+        if(requesterWorld != destWorld){
+            String error = "Failed to teleport, because " + TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET +" is in another dimension!";
+            playerReq.sendStatusMessage(new StringTextComponent(error), false);
             return;
         }
+
+        if(!reqSquad.playerCanDoTeleport(playerReq.getUniqueID())){
+            String error = "Too many teleportations in a too short amount of time. This is minecraft, not jumper!";
+            playerReq.sendStatusMessage(new StringTextComponent(error), false);
+            return;
+        }
+
         playerReq.teleport(destWorld, playerDest.getPosX(), playerDest.getPosY(), playerDest.getPosZ(), playerDest.cameraYaw, playerDest.rotationPitch);
+
+        String s = TextFormatting.RED +playerReq.getName().getString()+ TextFormatting.RESET;
+        s += " teleported to";
+        s += TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET;
+        setSquadChat(reqSquad, s);
     }
 
     private PlayerEntity getPlayerByUUID(UUID playerUUID){
