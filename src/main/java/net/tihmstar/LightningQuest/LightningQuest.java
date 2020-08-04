@@ -24,6 +24,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.JSONUtils;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -296,8 +297,13 @@ public class LightningQuest
                                             String msg = "you are holding a compass";
                                             player.sendStatusMessage(new StringTextComponent(msg),false);
 
-                                            Item newitm = Item.getItemById(10);
-                                            player.setHeldItem(Hand.MAIN_HAND,new ItemStack(newitm));
+                                            PlayerEntity enemy = getNearestEnemyPlayer(player);
+
+                                            BlockPos pointpos = new BlockPos(enemy.getPositionVec());
+
+                                            EnemyCompass ec = new EnemyCompass(new Item.Properties().group(ItemGroup.TOOLS),pointpos);
+
+                                            player.setHeldItem(Hand.MAIN_HAND,new ItemStack(ec));
 
                                             return 0;
                                         }
