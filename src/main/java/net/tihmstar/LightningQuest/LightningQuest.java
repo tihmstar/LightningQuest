@@ -49,7 +49,7 @@ import static net.minecraft.entity.EntityType.LIGHTNING_BOLT;
 public class LightningQuest
 {
     // Directly reference a log4j logger.
-    private static final Logger LOGGER = LogManager.getLogger();
+    //private static final Logger LOGGER = LogManager.getLogger();
 
     private static HashMap<UUID, UUID> playerToSquad = new HashMap<UUID, UUID>();
     private static HashMap<UUID, Squad> squadUuidMap = new HashMap<UUID, Squad>();
@@ -291,9 +291,16 @@ public class LightningQuest
     private void teleportPlayer(ServerPlayerEntity playerReq, ServerPlayerEntity playerDest){
         ServerWorld requesterWorld = playerReq.getServerWorld();
         ServerWorld destWorld = playerDest.getServerWorld();
+        Squad reqSquad = getSquadForPlayer(playerReq);
+        Squad destSquad = getSquadForPlayer(playerDest);
+        if(reqSquad != destSquad){
+            String error = "Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Player not in same Squad!";
+            return;
+        }
         if(requesterWorld!= destWorld){
-            String error = "";
-            LOGGER.debug("Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Worlds aren't identical!");
+            String error = "Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Worlds aren't identical!";
+            //LOGGER.debug("Cannot Teleport Player " + playerReq.getName()+ " to " + playerDest.getName() +"; Worlds aren't identical!");
+            //Squad playersquad = getSquadForPlayer(playerReq); für sendsquatchat...
             return;
         }
         playerReq.teleport(destWorld, playerDest.getPosX(), playerDest.getPosY(), playerDest.getPosZ(), playerDest.cameraYaw, playerDest.rotationPitch);
