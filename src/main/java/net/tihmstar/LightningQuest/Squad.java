@@ -15,7 +15,7 @@ public class Squad {
     public int onlineSquadPlayers = 0;
     public HashMap<UUID, Long> playersLastTeleport = new HashMap<UUID, Long>();
 
-    private const long teleportTimeout = 300;//seconds
+    private long teleportTimeout = 300;//seconds
 
     public Squad(String squadName) {
         this.squadName = squadName;
