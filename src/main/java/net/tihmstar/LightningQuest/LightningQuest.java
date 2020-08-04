@@ -359,7 +359,7 @@ public class LightningQuest
         playerReq.teleport(destWorld, playerDest.getPosX(), playerDest.getPosY(), playerDest.getPosZ(), playerDest.cameraYaw, playerDest.rotationPitch);
 
         String s = TextFormatting.RED +playerReq.getName().getString()+ TextFormatting.RESET;
-        s += " teleported to";
+        s += " teleported to ";
         s += TextFormatting.RED +playerDest.getName().getString()+ TextFormatting.RESET;
         setSquadChat(reqSquad, s);
     }
