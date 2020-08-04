@@ -9,6 +9,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import it.unimi.dsi.fastutil.Hash;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.Entity;
@@ -17,8 +19,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.CompassItem;
-import net.minecraft.item.Item;
+import net.minecraft.item.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
@@ -294,6 +295,9 @@ public class LightningQuest
 
                                             String msg = "you are holding a compass";
                                             player.sendStatusMessage(new StringTextComponent(msg),false);
+
+                                            Item newitm = Item.getItemById(10);
+                                            player.setHeldItem(Hand.MAIN_HAND,new ItemStack(newitm));
 
                                             return 0;
                                         }
