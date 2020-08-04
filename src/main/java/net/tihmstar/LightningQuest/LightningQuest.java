@@ -52,6 +52,9 @@ public class LightningQuest
     // Directly reference a log4j logger.
     //private static final Logger LOGGER = LogManager.getLogger();
 
+    private int playerLowHealthNotificationThreashold = 6;
+
+
     private static HashMap<UUID, UUID> playerToSquad = new HashMap<UUID, UUID>();
     private static HashMap<UUID, Squad> squadUuidMap = new HashMap<UUID, Squad>();
 
@@ -268,17 +271,35 @@ public class LightningQuest
     public void onPlayerLivingHurtEvent(LivingHurtEvent event) {
         DamageSource dmgsrc = event.getSource();
         Entity entity = dmgsrc.getTrueSource();
-        if (!(entity instanceof PlayerEntity)){
-            return;
+        Entity dstEntity = event.getEntity();
+        if (entity instanceof PlayerEntity){
+            //do reduced attack damage
+            PlayerEntity sourcePlayer = ((PlayerEntity)entity);
+            Squad squad = getSquadForPlayer(sourcePlayer);
+            if (squad != null) {
+                float multiplier = squad.getDamageMultiplier();
+                event.setAmount(event.getAmount() * multiplier);
+            }else{
+                event.setAmount(0);
+            }
         }
-        PlayerEntity sourcePlayer = ((PlayerEntity)entity);
-        Squad squad = getSquadForPlayer(sourcePlayer);
-        if (squad != null) {
-            float multiplier = squad.getDamageMultiplier();
-            event.setAmount(event.getAmount() * multiplier);
-        }else{
-            event.setAmount(0);
+
+        if (dstEntity instanceof PlayerEntity){
+            //do low health notification
+            PlayerEntity dstPlayer = (PlayerEntity)dstEntity;
+            if (dstPlayer.getHealth() < playerLowHealthNotificationThreashold){
+                Squad squad = getSquadForPlayer(dstPlayer);
+                if (squad != null){
+                    //notify squad
+                    String s = TextFormatting.RED + dstPlayer.getName().getString() + TextFormatting.RESET;
+                    s += " got punched to ";
+                    s+= TextFormatting.LIGHT_PURPLE + "critical" + TextFormatting.RESET;
+                    s += " health. He better not be responsible for everyone dying";
+                    setSquadChat(squad, s);
+                }
+            }
         }
+
     }
 
 
@@ -539,7 +560,7 @@ public class LightningQuest
             p.sendStatusMessage(sendtext, false);
         }
     }
-    
+
 
     /*
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
