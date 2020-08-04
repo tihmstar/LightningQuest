@@ -200,6 +200,20 @@ public class LightningQuest
 
                                 )
                 )
+                .then(
+                        Commands.literal("tp").then(
+                                Commands.argument("players", net.minecraft.command.arguments.EntityArgument.player())
+                                        .executes(command -> {
+                                            Collection<ServerPlayerEntity> players = getPlayers(command, "players");
+                                            final ServerPlayerEntity sourcePlayer = command.getSource().asPlayer();
+                                            final ServerPlayerEntity destinationPlayer = players.iterator().next();
+
+                                            playerTeleportToPlayer(sourcePlayer, destinationPlayer);
+
+                                            return 0;
+                                        })
+                        )
+                )
         );
     }
 
@@ -493,6 +507,17 @@ public class LightningQuest
         StringTextComponent infostr = new StringTextComponent(reply);
         player.sendStatusMessage(infostr, false);
     }
+
+    public void setSquadChat(Squad squad, String text){
+        StringTextComponent sendtext = new StringTextComponent("[Squad] " + text);
+        for (UUID pl : squad.getSquadMembers()){
+            PlayerEntity p = getPlayerByUUID(pl);
+            if (p == null) continue; //player might be offline
+
+            p.sendStatusMessage(sendtext, false);
+        }
+    }
+    
 
     /*
     // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD

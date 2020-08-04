@@ -1,8 +1,10 @@
 package net.tihmstar.LightningQuest;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.event.world.NoteBlockEvent;
 
+import java.time.Instant;
 import java.util.*;
 
 public class Squad {
@@ -10,8 +12,10 @@ public class Squad {
     private ArrayList<UUID> invites = new ArrayList<>();
     public boolean massKillingInProgress = false;
     public String squadName;
-
     public int onlineSquadPlayers = 0;
+    public HashMap<UUID, Long> playersLastTeleport = new HashMap<UUID, Long>();
+
+    private const long teleportTimeout = 300;//seconds
 
     public Squad(String squadName) {
         this.squadName = squadName;
@@ -79,4 +83,17 @@ public class Squad {
                 return 1;
         }
     }
+
+    public boolean playerCanDoTeleport(UUID playerUUID){
+        Long curTP = Instant.now().getEpochSecond();
+        if (playersLastTeleport.containsKey(playerUUID)){
+            Long lastTP = playersLastTeleport.get(playerUUID);
+            if (curTP - lastTP < teleportTimeout){
+                return false; //we are not yet ready to tp
+            }
+        }
+        playersLastTeleport.put(playerUUID, curTP);
+        return true;
+    }
+
 }
