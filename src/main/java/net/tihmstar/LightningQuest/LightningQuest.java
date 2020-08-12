@@ -304,7 +304,7 @@ public class LightningQuest
                                             CompassItem ec = new CompassItem(new Item.Properties().group(ItemGroup.TOOLS));
 
                                             ItemStack is = new ItemStack(ec,1);
-                                            player.replaceItemInInventory(1, is);
+                                            player.inventory.setInventorySlotContents(player.inventory.currentItem, is);
 
                                             return 0;
                                         }
