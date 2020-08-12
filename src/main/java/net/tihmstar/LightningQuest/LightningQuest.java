@@ -303,7 +303,8 @@ public class LightningQuest
 
                                             CompassItem ec = new CompassItem(new Item.Properties().group(ItemGroup.TOOLS));
 
-                                            player.setHeldItem(Hand.MAIN_HAND,new ItemStack(ec));
+                                            ItemStack is = new ItemStack(ec,1);
+                                            player.setHeldItem(Hand.MAIN_HAND,is);
 
                                             return 0;
                                         }
