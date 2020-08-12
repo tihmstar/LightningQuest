@@ -303,7 +303,7 @@ public class LightningQuest
 
                                             CompassItem ec = new CompassItem(new Item.Properties().group(ItemGroup.TOOLS));
 
-                                            ItemStack is = new ItemStack(ec,1);
+                                            ItemStack is = new ItemStack(player.getHeldItem(Hand.OFF_HAND).getItem(),7);
                                             player.inventory.setInventorySlotContents(player.inventory.currentItem, is);
 
                                             return 0;
