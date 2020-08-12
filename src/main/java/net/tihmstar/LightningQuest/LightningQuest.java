@@ -301,7 +301,7 @@ public class LightningQuest
 
                                             BlockPos pointpos = new BlockPos(enemy.getPositionVec());
 
-                                            EnemyCompass ec = new EnemyCompass(new Item.Properties().group(ItemGroup.TOOLS),pointpos);
+                                            CompassItem ec = new CompassItem(new Item.Properties().group(ItemGroup.TOOLS));
 
                                             player.setHeldItem(Hand.MAIN_HAND,new ItemStack(ec));
 
