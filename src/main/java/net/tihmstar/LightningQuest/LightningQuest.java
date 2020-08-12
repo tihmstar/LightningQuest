@@ -301,10 +301,10 @@ public class LightningQuest
 
                                             BlockPos pointpos = new BlockPos(enemy.getPositionVec());
 
-                                            CompassItem ec = new CompassItem(new Item.Properties().group(ItemGroup.TOOLS));
+                                            CompassItem ec = (CompassItem)Items.COMPASS;
 
-                                            ItemStack is = new ItemStack(player.getHeldItem(Hand.OFF_HAND).getItem(),7);
-                                            player.inventory.setInventorySlotContents(player.inventory.currentItem, is);
+                                            ItemStack is = new ItemStack(ec,1);
+                                            player.inventory.setInventorySlotContents(0, is);
 
                                             return 0;
                                         }
