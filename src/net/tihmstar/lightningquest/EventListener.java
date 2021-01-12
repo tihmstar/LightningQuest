@@ -34,7 +34,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onEntityDame(EntityDamageByEntityEvent e){
-        Entity entity = e.getEntity();
+        Entity entity = e.getDamager();
         if (!(entity instanceof Player)) return;
         Player damager = (Player)entity;
 
@@ -77,7 +77,7 @@ public class EventListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent e){
         if (wrkr != null){
             ItemStack is = e.getItem();
-            if (is != null && is.getType() != COMPASS) return;
+            if (is == null || is.getType() != COMPASS) return;
             Player player = e.getPlayer();
             Player enemy = wrkr.updateNearestEnemy(player);
             String tracking = null;

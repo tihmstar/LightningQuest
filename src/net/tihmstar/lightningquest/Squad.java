@@ -49,7 +49,7 @@ public class Squad {
     public float getDamageMultiplier(){
         switch (onlineSquadPlayers){
             case 1:
-                return 0;
+                return (float) 0.25;
             case 2:
                 return (float) 0.5;
             case 3:
@@ -66,7 +66,7 @@ public class Squad {
             Player player = Bukkit.getPlayer(pname);
             if (player == null) continue;
 
-            player.getWorld().strikeLightning(player.getLocation()); //might not kill
+            player.getWorld().strikeLightning(player.getLocation()); //might not kill?
         }
         killingInProgress = false;
     }

@@ -190,7 +190,7 @@ public class SquadManager {
             return;
         }
 
-        String reply = "You are member of ";
+        String reply = "You are in squad ";
         reply += ChatColor.GREEN + squad.getName() + ChatColor.RESET;
         reply += " which has ";
         reply += ChatColor.BLUE + String.format("%d",squad.getNumberOfMembers()) + ChatColor.RESET;

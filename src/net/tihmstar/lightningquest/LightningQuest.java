@@ -28,8 +28,13 @@ public class LightningQuest extends JavaPlugin {
         squadcmd.setExecutor(new SquadCommand(squads));
         squadcmd.setTabCompleter(new SquadTabCompleter(squads));
 
-        Worker wrkr = null;
+        if (config.isSquadTp()){
+            PluginCommand squadtpcmd = this.getCommand("squadtp");
+            squadtpcmd.setExecutor(new SquadTpCommand(squads));
+            squadtpcmd.setTabCompleter(new SquadTpTabCompleter(squads));
+        }
 
+        Worker wrkr = null;
         if (config.isCompassTracking()){
             wrkr = new Worker(squads);
             getLogger().info("CompassTracking Enabled");

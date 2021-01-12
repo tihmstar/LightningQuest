@@ -23,8 +23,10 @@ public class SquadTpTabCompleter implements TabCompleter {
         Player player = (Player)sender;
 
         Squad squad = squads.squadForPlayer(player);
-        if (squad != null){
-            return new ArrayList<>(squad.getSquadMembers());
+            if (squad != null){
+            ArrayList<String> ret = new ArrayList<>(squad.getSquadMembers());
+            ret.remove(player.getName());
+            return ret;
         }
         return new ArrayList<>(); //empty list indicates no autocompletion from this point on
     }

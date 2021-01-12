@@ -46,6 +46,11 @@ public class SquadTpCommand implements CommandExecutor {
             return true;
         }
 
+        if (player == dstPlayer){
+            player.sendMessage("Why would you want to teleport to yourself?");
+            return true;
+        }
+
         if (squad.advancementsPool <= 0){
             player.sendMessage("Your squad can not afford any more teleportations at the moment");
             return true;
