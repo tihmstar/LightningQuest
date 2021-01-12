@@ -8,6 +8,7 @@ public class Config {
 
     private boolean compassTracking;
     private boolean squadTp;
+    private boolean isInstantKill;
 
     public Config(Plugin plugin) {
         this.plugin = plugin;
@@ -25,6 +26,7 @@ public class Config {
 
         compassTracking = config.getBoolean("compass-tracking");
         squadTp = config.getBoolean("squad-tp");
+        isInstantKill = config.getBoolean("squad-instant-kill");
     }
 
     public boolean isCompassTracking() {
@@ -33,5 +35,9 @@ public class Config {
 
     public boolean isSquadTp() {
         return squadTp;
+    }
+
+    public boolean isInstantKill() {
+        return isInstantKill;
     }
 }

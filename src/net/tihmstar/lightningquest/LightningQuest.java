@@ -16,11 +16,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import static org.bukkit.Material.COMPASS;
 
 public class LightningQuest extends JavaPlugin {
+    private Config config;
 
     @Override
     public void onEnable(){
         //Fired when the server enables the plugin
-        Config config = new Config(this);
+        config = new Config(this);
         SquadManager squads = new SquadManager();
 
 
@@ -29,21 +30,24 @@ public class LightningQuest extends JavaPlugin {
         squadcmd.setTabCompleter(new SquadTabCompleter(squads));
 
         if (config.isSquadTp()){
+            getLogger().info("Squad teleportation enabled");
             PluginCommand squadtpcmd = this.getCommand("squadtp");
             squadtpcmd.setExecutor(new SquadTpCommand(squads));
             squadtpcmd.setTabCompleter(new SquadTpTabCompleter(squads));
+        }else{
+            getLogger().info("Squad teleportation disabled");
         }
 
         Worker wrkr = null;
         if (config.isCompassTracking()){
             wrkr = new Worker(squads);
-            getLogger().info("CompassTracking Enabled");
+            getLogger().info("CompassTracking enabled");
             getServer().getScheduler().scheduleSyncRepeatingTask(this, wrkr, 1, 10);//20 ticks = 1 second
         }else{
-            getLogger().info("CompassTracking Disabled");
+            getLogger().info("CompassTracking disabled");
         }
 
-        getServer().getPluginManager().registerEvents(new EventListener(squads, wrkr), this);
+        getServer().getPluginManager().registerEvents(new EventListener(squads, wrkr, config), this);
     }
 
     @Override

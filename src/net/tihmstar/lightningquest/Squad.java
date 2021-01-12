@@ -1,6 +1,7 @@
 package net.tihmstar.lightningquest;
 
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
 
@@ -22,6 +23,7 @@ public class Squad {
     }
 
     public void addPlayerToSquad(String player){
+        onlineSquadPlayers++;
         squadMembers.add(player);
     }
 
@@ -59,14 +61,17 @@ public class Squad {
         }
     }
 
-    public void killAllMembers(){
+    public void killAllMembers(boolean isInstantKill){
         if (killingInProgress) return;
         killingInProgress = true;
         for (String pname : squadMembers){
             Player player = Bukkit.getPlayer(pname);
             if (player == null) continue;
 
-            player.getWorld().strikeLightning(player.getLocation()); //might not kill?
+            player.getWorld().strikeLightning(player.getLocation());
+            if (isInstantKill){
+                player.setHealth(0);
+            }
         }
         killingInProgress = false;
     }

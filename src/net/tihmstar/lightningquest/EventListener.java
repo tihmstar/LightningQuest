@@ -1,9 +1,12 @@
 package net.tihmstar.lightningquest;
 
+import org.bukkit.ChatColor;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
@@ -17,10 +20,12 @@ import static org.bukkit.Material.COMPASS;
 public class EventListener implements Listener {
     final private SquadManager squads;
     final private Worker wrkr;
+    final private Config config;
 
-    EventListener(SquadManager squads, Worker wrkr){
+    EventListener(SquadManager squads, Worker wrkr, Config config){
         this.squads = squads;
         this.wrkr = wrkr;
+        this.config = config;
     }
 
     @EventHandler
@@ -28,7 +33,7 @@ public class EventListener implements Listener {
         Entity entity = e.getEntity();
         if (entity instanceof Player){
             Player player = (Player)entity;
-            squads.killPlayerSquad(player);
+            squads.killPlayerSquad(player,config.isInstantKill());
         }
     }
 
@@ -68,6 +73,7 @@ public class EventListener implements Listener {
     public void onPlayerAdvancement(PlayerAdvancementDoneEvent e) {
         Player player = e.getPlayer();
         Squad squad = squads.squadForPlayer(player);
+
         if (squad != null) {
             squad.advancementsPool++;
         }
@@ -76,6 +82,13 @@ public class EventListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e){
         if (wrkr != null){
+            switch (e.getAction()){
+                case RIGHT_CLICK_AIR:
+                case RIGHT_CLICK_BLOCK:
+                    break;
+                default:
+                    return;
+            }
             ItemStack is = e.getItem();
             if (is == null || is.getType() != COMPASS) return;
             Player player = e.getPlayer();
@@ -84,7 +97,7 @@ public class EventListener implements Listener {
             if (enemy != null){
                 Squad enemySquad = squads.squadForPlayer(enemy);
                 if (enemySquad != null){
-                    tracking = "Now tracking: " + enemySquad.getName();
+                    tracking = "Now tracking: " + ChatColor.GREEN + enemySquad.getName() + ChatColor.RESET;
                 }else{
                     tracking = "Now tracking: <a player>";
                 }

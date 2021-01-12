@@ -11,12 +11,12 @@
   <component name="ChangeListManager">
     <list default="true" id="0183c4a6-1f5f-403b-ba55-f2efad2a9d19" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/Config.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/EventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/EventListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/LightningQuest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/LightningQuest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/Squad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/Squad.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/SquadManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/SquadManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/SquadTpCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/SquadTpCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/SquadTpTabCompleter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/net/tihmstar/lightningquest/SquadTpTabCompleter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,17 +50,6 @@
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RunManager">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Spigot" type="JarApplication">
       <option name="JAR_PATH" value="spigot-1.16.4.jar" />
       <option name="PROGRAM_PARAMETERS" value="-nogui" />
@@ -81,7 +70,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1610446148293</updated>
-      <workItem from="1610446151074" duration="1784000" />
+      <workItem from="1610446151074" duration="1879000" />
+      <workItem from="1610460717218" duration="3085000" />
     </task>
     <servers />
   </component>
@@ -97,41 +87,45 @@
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
     <state x="488" y="283" width="1071" height="754" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.2048.1198@0.25.2048.1198" timestamp="1610446367434" />
-    <state width="2006" height="412" key="GridCell.Tab.0.bottom" timestamp="1610447486589">
+    <state width="2006" height="335" key="GridCell.Tab.0.bottom" timestamp="1610464232750">
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
-    <state width="2006" height="412" key="GridCell.Tab.0.bottom/0.25.2048.1198@0.25.2048.1198" timestamp="1610447486589" />
-    <state width="2006" height="412" key="GridCell.Tab.0.center" timestamp="1610447486588">
+    <state width="2006" height="335" key="GridCell.Tab.0.bottom/0.25.2048.1198@0.25.2048.1198" timestamp="1610464232750" />
+    <state width="2006" height="335" key="GridCell.Tab.0.center" timestamp="1610464232750">
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
-    <state width="2006" height="412" key="GridCell.Tab.0.center/0.25.2048.1198@0.25.2048.1198" timestamp="1610447486588" />
-    <state width="2006" height="412" key="GridCell.Tab.0.left" timestamp="1610447486586">
+    <state width="2006" height="335" key="GridCell.Tab.0.center/0.25.2048.1198@0.25.2048.1198" timestamp="1610464232750" />
+    <state width="2006" height="335" key="GridCell.Tab.0.left" timestamp="1610464232750">
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
-    <state width="2006" height="412" key="GridCell.Tab.0.left/0.25.2048.1198@0.25.2048.1198" timestamp="1610447486586" />
-    <state width="2006" height="412" key="GridCell.Tab.0.right" timestamp="1610447486588">
+    <state width="2006" height="335" key="GridCell.Tab.0.left/0.25.2048.1198@0.25.2048.1198" timestamp="1610464232750" />
+    <state width="2006" height="335" key="GridCell.Tab.0.right" timestamp="1610464232750">
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
-    <state width="2006" height="412" key="GridCell.Tab.0.right/0.25.2048.1198@0.25.2048.1198" timestamp="1610447486588" />
-    <state width="2006" height="412" key="GridCell.Tab.1.bottom" timestamp="1610447555620">
+    <state width="2006" height="335" key="GridCell.Tab.0.right/0.25.2048.1198@0.25.2048.1198" timestamp="1610464232750" />
+    <state width="2006" height="323" key="GridCell.Tab.1.bottom" timestamp="1610464232747">
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
-    <state width="2006" height="412" key="GridCell.Tab.1.bottom/0.25.2048.1198@0.25.2048.1198" timestamp="1610447555620" />
-    <state width="2006" height="412" key="GridCell.Tab.1.center" timestamp="1610447555619">
+    <state width="2006" height="323" key="GridCell.Tab.1.bottom/0.25.2048.1198@0.25.2048.1198" timestamp="1610464232747" />
+    <state width="2006" height="323" key="GridCell.Tab.1.center" timestamp="1610464232746">
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
-    <state width="2006" height="412" key="GridCell.Tab.1.center/0.25.2048.1198@0.25.2048.1198" timestamp="1610447555619" />
-    <state width="2006" height="412" key="GridCell.Tab.1.left" timestamp="1610447555619">
+    <state width="2006" height="323" key="GridCell.Tab.1.center/0.25.2048.1198@0.25.2048.1198" timestamp="1610464232746" />
+    <state width="2006" height="323" key="GridCell.Tab.1.left" timestamp="1610464232746">
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
-    <state width="2006" height="412" key="GridCell.Tab.1.left/0.25.2048.1198@0.25.2048.1198" timestamp="1610447555619" />
-    <state width="2006" height="412" key="GridCell.Tab.1.right" timestamp="1610447555620">
+    <state width="2006" height="323" key="GridCell.Tab.1.left/0.25.2048.1198@0.25.2048.1198" timestamp="1610464232746" />
+    <state width="2006" height="323" key="GridCell.Tab.1.right" timestamp="1610464232746">
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
-    <state width="2006" height="412" key="GridCell.Tab.1.right/0.25.2048.1198@0.25.2048.1198" timestamp="1610447555620" />
+    <state width="2006" height="323" key="GridCell.Tab.1.right/0.25.2048.1198@0.25.2048.1198" timestamp="1610464232746" />
     <state x="512" y="202" key="SettingsEditor" timestamp="1610446217052">
       <screen x="0" y="25" width="2048" height="1198" />
     </state>
     <state x="512" y="202" key="SettingsEditor/0.25.2048.1198@0.25.2048.1198" timestamp="1610446217052" />
+    <state x="725" y="379" width="597" height="490" key="find.popup" timestamp="1610461961034">
+      <screen x="0" y="25" width="2048" height="1198" />
+    </state>
+    <state x="725" y="379" width="597" height="490" key="find.popup/0.25.2048.1198@0.25.2048.1198" timestamp="1610461961034" />
   </component>
 </project>

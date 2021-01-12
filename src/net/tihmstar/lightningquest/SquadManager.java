@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 public class SquadManager {
     final private HashMap<String, Squad> playerToSquad = new HashMap<String, Squad>();
-    final private HashMap<String,Squad> squads = new HashMap<String,Squad>();
+    final private HashMap<String, Squad> squads = new HashMap<String,Squad>();
     final private HashMap<String, HashSet<String>> invitesForPlayer = new HashMap<String, HashSet<String>>();
 
     void playerCreateSquad(Player player, String name){
@@ -34,7 +34,6 @@ public class SquadManager {
 
         Squad newSquad = new Squad(name);
         newSquad.addPlayerToSquad(player.getName());
-        newSquad.onlineSquadPlayers++;
         squads.put(name,newSquad);
         playerToSquad.put(player.getName(), newSquad);
 
@@ -127,6 +126,7 @@ public class SquadManager {
 
         invitesForPlayer.remove(player.getName()); //drop all other invites for this player, since he already made a decision!
         squad.addPlayerToSquad(player.getName());
+        playerToSquad.put(player.getName(),squad);
 
         {
             String s = "An idiot called ";
@@ -176,8 +176,14 @@ public class SquadManager {
         }
 
         {
-            String s = "You can join the following squads: ";
-            s += String.join(", ", invites);
+            String s = "";
+            for (String i : invites){
+                if (s.length() > 0){
+                    s += ", ";
+                }
+                s += ChatColor.GREEN + i + ChatColor.RESET;
+            }
+            s = "You can join the following squads: " + s;
             player.sendMessage(s);
         }
     }
@@ -209,10 +215,10 @@ public class SquadManager {
         player.sendMessage(reply);
     }
 
-    public void killPlayerSquad(Player player){
+    public void killPlayerSquad(Player player, boolean isInstantKill){
         Squad squad = playerToSquad.get(player.getName());
         if (squad != null){
-            squad.killAllMembers();
+            squad.killAllMembers(isInstantKill);
         }
     }
 
