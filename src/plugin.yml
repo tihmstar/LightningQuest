@@ -1,0 +1,14 @@
+name: LightningQuest
+version: 1.0
+author: tihmstar
+main: net.tihmstar.lightningquest.LightningQuest
+api-version: 1.16
+
+# Replace "kit" with the name of your command.
+commands:
+  squad:
+    description: Manage squads
+    usage: "/squad create <name>\n/squad invite <player>\n/squad join <name>\n/squad leave\n/squad info\n/squad list"
+  squadtp:
+    description: Teleport to squad members
+    usage: "/squadtp <member>"
