@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="LightningQuest">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/server/plugins/LightningQuest.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
